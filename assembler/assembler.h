@@ -24,6 +24,7 @@ struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText, FIL
 enum compilationErrs compileCode     (struct Text *codeText, FILE* const asmHere);
 enum compilationErrs printToProg (FILE* const asmHere, char* cmd, double arg);
 void printErrorInfo (struct errorInfo* pInfo);
+void printSplitter ();
 
 const double poisonProc = 0xFFFFFF;
 static const char splitter[] = 
@@ -127,19 +128,22 @@ enum compilationErrs compileCode (struct Text *codeText, FILE* const asmHere)
     {    
         case UNRECOGNISED_COMMAND: 
             printf ("Compilation error occured, unrecognised command in text\n");
+            printSplitter();
             break;
 
         case MISSED_ARGUMENT:
             printf ("You forgot to put an argument (or your argument is equal to %lg)\n",
                          poisonProc);
+            printSplitter();
             break;
 
         case TOO_MANY_ARGUMENTS:
             printf ("\nToo many arguments for a function\n");
+            printSplitter();
             break;
 
         case NO_ERROR:
-            printf ("Compilation was successful\n");
+            printf ("Compilation was successful\n"); 
             break;
 
         default:
@@ -156,8 +160,12 @@ void printErrorInfo (struct errorInfo* pInfo)
     printf ("An error has occured while compiling\n");
     printf ("While compiling this command: %s\n", pInfo->line);
     printf ("In line: %zu", pInfo->nLine); 
-    printf ("\n%s\n\n", splitter);
 
     fflush (stdin);
 }
 
+void printSplitter ()
+{
+    printf ("%s\n\n", splitter);
+    fflush (stdin);
+}
