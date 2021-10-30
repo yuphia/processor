@@ -23,7 +23,7 @@ NUM_ERRORS = -fmax-errors=1
 
 SOURCES = assembler.cpp ./../lib/StrFuncs/strlibMy.cpp ./../lib/SortingAlg/sort.cpp ./../lib/fileInput/fileInputTreatment.cpp assFunctions.cpp
 
-DIRECTORIES = -I ./lib/SortingAlg/ -I ./../lib/StrFuncs/ -I ./../lib/fileInput/ -I ./../lib/MistakeHandling/
+DIRECTORIES = -I ./../lib/SortingAlg/ -I ./../lib/StrFuncs/ -I ./../lib/fileInput/ -I ./../lib/MistakeHandling/ -I ./../lib/commands/
 
 DIR_BUILD = build
 DIR_RELEASE = $(DIR_BUILD)/release

@@ -2,11 +2,11 @@
 
 #define ASS_FUNCTIONS_H 1
 
-#include "../lib/SortingAlg/sort.h"
-#include "../lib/StrFuncs/strlibMy.h"
-#include "../lib/fileInput/fileInputTreatment.h"
-#include "../lib/commands/commands.h"
-#include "../lib/MistakeHandling/myAssert.h"
+#include "sort.h"
+#include "strlibMy.h"
+#include "fileInputTreatment.h"
+#include "commands.h"
+#include "myAssert.h"
 
 #define write(cmd)\
         char thisCmdN = cmd;\
