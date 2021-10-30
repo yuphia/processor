@@ -2,6 +2,7 @@
 #include "../lib/StrFuncs/strlibMy.h"
 #include "../lib/fileInput/fileInputTreatment.h"
 #include "../lib/commands/commands.h"
+#include "../lib/MistakeHandling/myAssert.h"
 
 enum compilationErrs 
         {
@@ -28,6 +29,8 @@ struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText,
 enum compilationErrs compileCode     (struct Text *codeText, FILE* const asmHere);
 
 enum compilationErrs putToCode (FILE* const asmHere, char* cmd, double arg, char* line);
+
+char* skipCmd (char* str);
 
 void printErrorInfo (struct errorInfo* pInfo);
 void printSplitter ();
@@ -69,9 +72,7 @@ enum compilationErrs parseLine (struct Line* line, FILE* const asmHere)
     double arg = 0xFFFFFF;
 
     sscanf (line->line, "%s", cmd);/*%lg*/
-    sscanf (line->line, "%lg", &arg);
-    printf ("arg = %lg", arg);
-
+    
     enum compilationErrs compilationStatus = putToCode (asmHere, cmd, arg, line->line);
            
     return compilationStatus;
@@ -89,6 +90,14 @@ enum compilationErrs putToCode (FILE* const asmHere, char* cmd, double arg, char
     else if (strcmp (cmd, "pop") == 0)
     {
         fprintf (asmHere, "%lg", (double)POP);         
+
+        char* pointerToArg = skipCmd (line);
+    
+        if (pointerToArg != nullptr)
+        {
+        sscanf (pointerToArg, "%lg", &arg);
+        }
+
         if (arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
     }
@@ -176,15 +185,16 @@ void printErrorInfo (struct errorInfo* pInfo)
 void printSplitter ()
 {
     printf ("%s\n\n", splitter);
-    fflush (stdin);
+    fflush (stdout);
 }
 
 char* skipCmd (char* str)
 {
-    for (size_t currentSymbol = 0; currentSymbol < strlen (str); currentSymbol++);
+    size_t currentSymbol = 0;
+    for (; currentSymbol < strlen (str); currentSymbol++);
     
-    if (currentSymbol == strlen (str) - 1)
-        return 0;
+    if (currentSymbol >= strlen (str) - 1)
+        return nullptr;
 
     return str + currentSymbol;
 }

@@ -5,6 +5,9 @@ int main()
     FILE* const code = fopen ("code.txt", "rb");
     FILE* const asmHere = fopen ("asm.txt", "wb");
 
+    MY_ASSERT (code != nullptr, "An error occurred while opening code file");
+    MY_ASSERT (asmHere != nullptr, "An error occurred while opening assembler file");
+
     struct Text codeText = {};
 
     fflush (stdout);
