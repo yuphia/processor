@@ -1,43 +1,4 @@
-#include "../lib/SortingAlg/sort.h"
-#include "../lib/StrFuncs/strlibMy.h"
-#include "../lib/fileInput/fileInputTreatment.h"
-#include "../lib/commands/commands.h"
-#include "../lib/MistakeHandling/myAssert.h"
-
-enum compilationErrs 
-        {
-        NO_ERROR = 0,
-        UNRECOGNISED_COMMAND = 1,
-        MISSED_ARGUMENT = 2,
-        TOO_MANY_ARGUMENTS = 3        
-        };
-
-struct errorInfo
-        {
-        enum compilationErrs compilationStatus;
-        size_t nLine;
-        char* line;
-        };
-
-void getCode (FILE* const code, struct Text *codeText);
-
-enum compilationErrs parseLine (struct Line* line, FILE* const asmHere);
-
-struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText, 
-                                   FILE* const asmHere);
-
-enum compilationErrs compileCode     (struct Text *codeText, FILE* const asmHere);
-
-enum compilationErrs putToCode (FILE* const asmHere, char* cmd, double arg, char* line);
-
-char* skipCmd (char* str);
-
-void printErrorInfo (struct errorInfo* pInfo);
-void printSplitter ();
-
-const double poisonProc = 0xFFFFFF;
-static const char splitter[] = 
-            "============================================================";
+#include "assFunctions.h"
 
 void getCode (FILE* const code, struct Text *codeText)
 {
@@ -69,57 +30,59 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
 enum compilationErrs parseLine (struct Line* line, FILE* const asmHere)
 {
     char cmd[5] = "";
-    double arg = 0xFFFFFF;
+    double arg = poisonProc;
 
     sscanf (line->line, "%s", cmd);/*%lg*/
     
-    enum compilationErrs compilationStatus = putToCode (asmHere, cmd, arg, line->line);
+    enum compilationErrs compilationStatus = putToCode (asmHere, cmd, line->line, &arg);
            
     return compilationStatus;
 }
 
-enum compilationErrs putToCode (FILE* const asmHere, char* cmd, double arg, char* line)
+enum compilationErrs putToCode (FILE* const asmHere, char* cmd,
+                                char* line, double* arg)
 {
     if (strcmp (cmd, "push") == 0)
     {
-        fprintf (asmHere, "%lg%lg", (double)PUSH, arg);
-        if (arg == poisonProc)
+        write (PUSH);
+
+        if (getArgument (line, arg) != NO_ERROR)
             return MISSED_ARGUMENT;
+
+        if (fwrite (arg, sizeof(double), 1, asmHere) != 1)
+            return WRITING_ERROR;
+
+        return NO_ERROR; 
     }
 
     else if (strcmp (cmd, "pop") == 0)
-    {
-        fprintf (asmHere, "%lg", (double)POP);         
+    {                 
+        write (POP);          
 
-        char* pointerToArg = skipCmd (line);
-    
-        if (pointerToArg != nullptr)
-        {
-        sscanf (pointerToArg, "%lg", &arg);
-        }
-
-        if (arg != poisonProc)
+        if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
     }
     
     else if (strcmp (cmd, "hlt") == 0)
-    { 
-        fprintf (asmHere, "%lg", (double)HALT);
-        if (arg != poisonProc)
+    {
+        write (HALT); 
+        
+        if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
     }
 
     else if (strcmp (cmd, "add") == 0)
     {
-        fprintf (asmHere, "%lg", (double)ADD);
-        if (arg != poisonProc)
+        write (ADD);
+        if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
     }
 
     else if (strcmp (cmd, "mul") == 0)
     {
-        fprintf (asmHere, "%lg", (double)MUL);
-        if (arg != poisonProc)
+        write (MUL);
+                
+        if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
     }
 
@@ -143,9 +106,14 @@ enum compilationErrs compileCode (struct Text *codeText, FILE* const asmHere)
         printErrorInfo (pInfo);
 
     switch (pInfo->compilationStatus)
-    {    
+    {   
+        case WRITING_ERROR:
+            printf ("Couldn't write to the code file\n");
+            printSplitter();
+            break;
+
         case UNRECOGNISED_COMMAND: 
-            printf ("Compilation error occured, unrecognised command in text\n");
+            printf ("Compilation error occurred, unrecognised command in text\n");
             printSplitter();
             break;
 
@@ -191,10 +159,30 @@ void printSplitter ()
 char* skipCmd (char* str)
 {
     size_t currentSymbol = 0;
-    for (; currentSymbol < strlen (str); currentSymbol++);
-    
+    for (; currentSymbol < strlen (str) && *(str + currentSymbol) != ' ';
+                                                             currentSymbol++);     
+
     if (currentSymbol >= strlen (str) - 1)
         return nullptr;
 
     return str + currentSymbol;
 }
+
+enum compilationErrs getArgument (char* line, double* argument)
+{
+    char* pointerToArg = skipCmd (line);
+    //printf ("pointer to argument = %p", (void*) pointerToArg);
+
+    if (pointerToArg == nullptr)
+    {
+        return MISSED_ARGUMENT;    
+    }
+
+    int scanfReturn = sscanf (pointerToArg, "%lg", argument);
+
+    if (*argument == poisonProc  && scanfReturn == 1)
+        return MISSED_ARGUMENT;
+
+    return NO_ERROR;
+} 
+

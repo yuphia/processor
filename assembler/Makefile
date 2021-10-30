@@ -21,7 +21,7 @@ DISABLE_DEBUG = -D NDEBUG_STK
 
 NUM_ERRORS = -fmax-errors=1
 
-SOURCES = assembler.cpp ./../lib/StrFuncs/strlibMy.cpp ./../lib/SortingAlg/sort.cpp ./../lib/fileInput/fileInputTreatment.cpp
+SOURCES = assembler.cpp ./../lib/StrFuncs/strlibMy.cpp ./../lib/SortingAlg/sort.cpp ./../lib/fileInput/fileInputTreatment.cpp assFunctions.cpp
 
 DIRECTORIES = -I ./lib/SortingAlg/ -I ./../lib/StrFuncs/ -I ./../lib/fileInput/ -I ./../lib/MistakeHandling/
 
