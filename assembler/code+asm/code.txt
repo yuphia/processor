@@ -1,4 +1,4 @@
-push 16
+push [16]
 push 15 
 push 17
 

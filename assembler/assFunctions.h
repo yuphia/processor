@@ -12,13 +12,22 @@
         char thisCmdN = cmd;\
         fwrite (&thisCmdN, sizeof(char), 1, asmHere);
 
+#define fillFieldAndWrite()\
+            struct cmdField thisCmd = {isRegister, isMemory, isImmidiate, cmd};\
+            write (thisCmd.cmd + thisCmd.mem*2*2*2*2*2*2*2 +\
+                                        thisCmd.reg*2*2*2*2*2*2*2*2 +\
+                                        thisCmd.imm*2*2*2*2*2*2);             
+
 enum compilationErrs 
         {
         NO_ERROR = 0,
         UNRECOGNISED_COMMAND = 1,
         MISSED_ARGUMENT = 2,
         TOO_MANY_ARGUMENTS = 3,
-        WRITING_ERROR = 4        
+        WRITING_ERROR = 4,
+        STRAY_OPEN_BRACKET = 5,
+        STRAY_CLOSE_BRACKET = 6,
+        EXTRA_BRACKETS = 7        
         };
 
 struct errorInfo
@@ -38,19 +47,24 @@ struct cmdField
 
 void getCode (FILE* const code, struct Text *codeText);
 
-enum compilationErrs parseLine (struct Line* line, FILE* const asmHere);
+enum compilationErrs parseLine (struct Line* line);
 
-struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText, 
-                                   FILE* const asmHere);
+struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText);
 
-enum compilationErrs compileCode     (struct Text *codeText, FILE* const asmHere);
+enum compilationErrs compileCode     (struct Text *codeText);
 
-enum compilationErrs putToCode (FILE* const asmHere, char* cmd, 
+enum compilationErrs putToCode (char* cmd, 
                                 char* line, double* arg);
 
-enum compilationErrs getArgument (char* line, double* argument);
+enum compilationErrs isMemoryCommand (char** line, bool* isMemory);
+enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket);
+
+enum compilationErrs getArgument (char* line, double* argument,
+                                  enum commands cmd, FILE* const asmHere);
 
 char* skipCmd (char* str);
+
+bool isMemoryCommand (char* line);
 
 void printErrorInfo (struct errorInfo* pInfo);
 void printSplitter ();
