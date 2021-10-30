@@ -19,10 +19,16 @@ struct errorInfo
         };
 
 void getCode (FILE* const code, struct Text *codeText);
+
 enum compilationErrs parseLine (struct Line* line, FILE* const asmHere);
-struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText, FILE* const asmHere);
+
+struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText, 
+                                   FILE* const asmHere);
+
 enum compilationErrs compileCode     (struct Text *codeText, FILE* const asmHere);
-enum compilationErrs printToProg (FILE* const asmHere, char* cmd, double arg);
+
+enum compilationErrs putToCode (FILE* const asmHere, char* cmd, double arg, char* line);
+
 void printErrorInfo (struct errorInfo* pInfo);
 void printSplitter ();
 
@@ -35,7 +41,8 @@ void getCode (FILE* const code, struct Text *codeText)
     transitFileToLineArray (code, codeText);
 }
 
-struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText, FILE* const asmHere)
+struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText,
+                                   FILE* const asmHere)
 {
     size_t codeSize = codeText->nLines;
 
@@ -58,17 +65,19 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
 
 enum compilationErrs parseLine (struct Line* line, FILE* const asmHere)
 {
-    char cmd[20] = "";
+    char cmd[5] = "";
     double arg = 0xFFFFFF;
 
-    sscanf (line->line, "%s %lg", cmd, &arg);
+    sscanf (line->line, "%s", cmd);/*%lg*/
+    sscanf (line->line, "%lg", &arg);
+    printf ("arg = %lg", arg);
 
-    enum compilationErrs compilationStatus = printToProg (asmHere, cmd, arg);
+    enum compilationErrs compilationStatus = putToCode (asmHere, cmd, arg, line->line);
            
     return compilationStatus;
 }
 
-enum compilationErrs printToProg (FILE* const asmHere, char* cmd, double arg)
+enum compilationErrs putToCode (FILE* const asmHere, char* cmd, double arg, char* line)
 {
     if (strcmp (cmd, "push") == 0)
     {
@@ -159,7 +168,7 @@ void printErrorInfo (struct errorInfo* pInfo)
     printf ("\n\n%s\n", splitter);
     printf ("An error has occured while compiling\n");
     printf ("While compiling this command: %s\n", pInfo->line);
-    printf ("In line: %zu", pInfo->nLine); 
+    printf ("In line: %zu\n", pInfo->nLine); 
 
     fflush (stdin);
 }

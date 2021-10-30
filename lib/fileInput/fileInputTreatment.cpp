@@ -16,7 +16,7 @@ size_t getFileSize (FILE* inputFile)
 
 bool isFile (FILE* file)
 {
-    return (file != nullptr) ? true : false;
+    return (file != nullptr);
 }
 
 void transitFileToText (FILE* inputFile, struct Text* text)

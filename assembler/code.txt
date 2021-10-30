@@ -1,8 +1,2 @@
 push 5.4
-push 54
-mul
-push 89
-add 
-pop
-hlt
-hlt
+
