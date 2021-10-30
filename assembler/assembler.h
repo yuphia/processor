@@ -178,3 +178,13 @@ void printSplitter ()
     printf ("%s\n\n", splitter);
     fflush (stdin);
 }
+
+char* skipCmd (char* str)
+{
+    for (size_t currentSymbol = 0; currentSymbol < strlen (str); currentSymbol++);
+    
+    if (currentSymbol == strlen (str) - 1)
+        return 0;
+
+    return str + currentSymbol;
+}

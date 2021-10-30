@@ -1,7 +1,4 @@
 #include "assembler.h"
-#include "../lib/SortingAlg/sort.h"
-#include "../lib/StrFuncs/strlibMy.h"
-#include "../fileInput/fileInputTreatment.h"
 
 int main()
 {
