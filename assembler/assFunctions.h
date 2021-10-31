@@ -8,13 +8,13 @@
 #include "commands.h"
 #include "myAssert.h"
 
-#define write(cmd)\
+#define WRITE(cmd)\
         char thisCmdN = cmd;\
         fwrite (&thisCmdN, sizeof(char), 1, asmHere);
 
-#define fillFieldAndWrite()\
+#define FILL_FIELD_AND_WRITE()\
             struct cmdField thisCmd = {isRegister, isMemory, isImmidiate, cmd};\
-            write (thisCmd.cmd +        thisCmd.mem*2*2*2*2*2*2 +\
+            WRITE (thisCmd.cmd +        thisCmd.mem*2*2*2*2*2*2 +\
                                         thisCmd.reg*2*2*2*2*2*2*2 +\
                                         thisCmd.imm*2*2*2*2*2);            
 

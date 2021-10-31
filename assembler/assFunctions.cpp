@@ -62,7 +62,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg)
 
     else if (strcmp (cmd, "pop") == 0)
     {                 
-        write (POP);          
+        WRITE (POP);          
 
         if (*arg != poisonProc)
         {
@@ -73,7 +73,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg)
     
     else if (strcmp (cmd, "hlt") == 0)
     {
-        write (HALT); 
+        WRITE (HALT); 
         
         if (*arg != poisonProc)
         {
@@ -84,7 +84,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg)
 
     else if (strcmp (cmd, "add") == 0)
     {
-        write (ADD);
+        WRITE (ADD);
         if (*arg != poisonProc)
         {
             fclose (asmHere);
@@ -94,7 +94,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg)
 
     else if (strcmp (cmd, "mul") == 0)
     {
-        write (MUL);
+        WRITE (MUL);
                 
         if (*arg != poisonProc)
         {
@@ -243,7 +243,7 @@ enum compilationErrs getArgument (char* line, double* argument,
     if (isRegister == 1 && reg == WRONG_REG)
         return WRONG_REG_ERROR;
 
-    fillFieldAndWrite();
+    FILL_FIELD_AND_WRITE();
 
     return NO_ERROR;
 } 
