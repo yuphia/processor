@@ -14,9 +14,13 @@
 
 #define fillFieldAndWrite()\
             struct cmdField thisCmd = {isRegister, isMemory, isImmidiate, cmd};\
-            write (thisCmd.cmd + thisCmd.mem*2*2*2*2*2*2*2 +\
-                                        thisCmd.reg*2*2*2*2*2*2*2*2 +\
-                                        thisCmd.imm*2*2*2*2*2*2);             
+            write (thisCmd.cmd +        thisCmd.mem*2*2*2*2*2*2 +\
+                                        thisCmd.reg*2*2*2*2*2*2*2 +\
+                                        thisCmd.imm*2*2*2*2*2);            
+
+#define $ printf ("line = %d\n", __LINE__);\
+          fflush (stdout);
+
 
 enum compilationErrs 
         {
@@ -27,7 +31,18 @@ enum compilationErrs
         WRITING_ERROR = 4,
         STRAY_OPEN_BRACKET = 5,
         STRAY_CLOSE_BRACKET = 6,
-        EXTRA_BRACKETS = 7        
+        EXTRA_BRACKETS = 7,
+        WRONG_REG_ERROR = 8,
+        FORBIDDEN_ARGUMENT = 9        
+        };
+
+enum Reg
+        {
+        AX = 1,
+        BX = 2,
+        CX = 3,
+        DX = 4,
+        WRONG_REG = 5
         };
 
 struct errorInfo
@@ -62,9 +77,16 @@ enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket);
 enum compilationErrs getArgument (char* line, double* argument,
                                   enum commands cmd, FILE* const asmHere);
 
+enum compilationErrs isImmRegDetection (char* line, bool* isRegister, bool* isImmidiate,
+                                        double* arg, enum Reg* reg);
+
+enum Reg detectRegister (char* regName);
+
 char* skipCmd (char* str);
 
 bool isMemoryCommand (char* line);
+
+bool isRegOk (char* regName);
 
 void printErrorInfo (struct errorInfo* pInfo);
 void printSplitter ();

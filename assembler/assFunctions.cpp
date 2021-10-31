@@ -48,6 +48,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg)
         enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere);
         if (argErr != NO_ERROR)
         {
+            printf ("argErr = %d", argErr);
             fclose (asmHere);
             return argErr;
         }
@@ -141,8 +142,14 @@ enum compilationErrs compileCode (struct Text *codeText)
             printSplitter();
             break;
 
+        case FORBIDDEN_ARGUMENT:
+            printf ("You are using an argument that can't be used as an input"                    
+                    " (check poisonProc constant)\n");
+            printSplitter();
+            break;
+
         case TOO_MANY_ARGUMENTS:
-            printf ("\nToo many arguments for a function\n");
+            printf ("Too many arguments for a function\n");
             printSplitter();
             break;
 
@@ -162,6 +169,12 @@ enum compilationErrs compileCode (struct Text *codeText)
 
         case EXTRA_BRACKETS:
             printf ("Too many [ or ] expressions like this don't work [[]]\n");
+            printSplitter();
+            break;
+
+        case WRONG_REG_ERROR:
+            printf ("Check your register name in this line (accepted register names:"
+                    "ax, bx, cx, dx)\n");
             printSplitter();
             break;
 
@@ -210,20 +223,32 @@ enum compilationErrs getArgument (char* line, double* argument,
     bool isRegister  = false;
     bool isImmidiate = false;
 
-    enum compilationErrs checkMem = isMemoryCommand (&pointerToArg, &isMemory);
+    enum Reg reg = WRONG_REG;
 
-    if (checkMem != NO_ERROR)
-        return checkMem;
-    
     if (pointerToArg == nullptr)
-    {
+    {   
         return MISSED_ARGUMENT;    
-    }
+    } 
 
-    int scanfReturn = sscanf (pointerToArg, "%lg", argument);
+    enum compilationErrs checkMem = isMemoryCommand (&pointerToArg, &isMemory);
+    
+    if (checkMem != NO_ERROR)
+        return checkMem; 
 
-    if (*argument == poisonProc  && scanfReturn == 1)
-        return MISSED_ARGUMENT;
+    printf ("pointer to arg = %s\n", pointerToArg);
+
+    enum compilationErrs checkImmAndReg = isImmRegDetection (pointerToArg, &isRegister,
+                                                             &isImmidiate, argument, &reg);
+
+    if (checkImmAndReg != NO_ERROR)
+        return checkImmAndReg;
+    
+    if (isRegister == 1 && reg == WRONG_REG)
+        return WRONG_REG_ERROR;
+
+    //printf ("regnum = %d", reg);
+    
+    printf ("isMem = %d\n", isMemory);
 
     fillFieldAndWrite();
 
@@ -281,4 +306,99 @@ enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket)
         return STRAY_CLOSE_BRACKET;
 
     return NO_ERROR;
+}
+
+enum compilationErrs isImmRegDetection (char* line, bool* isRegister, bool* isImmidiate,
+                                        double* arg, enum Reg* reg)
+{
+    static size_t runThrough = 0;
+
+    runThrough++;
+
+    int checkPointer = 0;
+    printf ("\nrunThrough = %zu\n"
+            "read symb = %d\n"
+            "line = %s\n\n", runThrough, checkPointer, line);
+
+    char* regName = (char*)calloc (4, sizeof (char));
+     MY_ASSERT (regName != nullptr, "Pointer to regName equals nullptr\n");      
+
+    printf ("line pointer = %p\n"
+            "regName = %p\n\n", (void*)line, (void*)regName);
+   
+    //printf ("read symb = %d\n"
+    //        "line = %s\n", checkPointer, line);
+
+    sscanf (line, "%1sx+%lg%n", regName, arg, &checkPointer);
+    
+    printf ("read symb = %d\n"
+            "line = %s\n", checkPointer, line);    
+
+    if (checkPointer == 5)
+    {
+        *reg = detectRegister (regName);
+        printf ("arg = %lg\n", *arg);
+        if (*reg == WRONG_REG)
+            return WRONG_REG_ERROR;
+
+        if (*arg == poisonProc)
+            return FORBIDDEN_ARGUMENT;
+
+        *isRegister  = 1;
+        *isImmidiate = 1;
+        
+        free (regName);
+        return NO_ERROR;
+    }
+    
+    sscanf (line, "%1sx%n", regName, &checkPointer);
+    if (checkPointer == 3)
+    {
+        *reg = detectRegister (regName);
+        if (*reg == WRONG_REG)
+            return WRONG_REG_ERROR;
+
+        *isRegister = 1;
+        
+        free (regName);
+        return NO_ERROR;
+    }
+
+    free (regName);
+
+    sscanf (line, "%lg%n", arg, &checkPointer);
+    if (checkPointer == 3)
+    {
+        if (*arg == poisonProc)
+            return FORBIDDEN_ARGUMENT;
+
+        return NO_ERROR;
+    }
+
+    return MISSED_ARGUMENT;
+}
+
+enum Reg detectRegister (char* regName)
+{
+    if (isRegOk (regName))
+        return WRONG_REG;
+
+    if (*regName == 'a')
+        return AX;
+    else if (*regName == 'b')
+        return BX;
+    else if (*regName == 'c')
+        return CX;
+    else if (*regName == 'd')
+        return DX;
+
+    return WRONG_REG;
+}
+
+bool isRegOk (char* regName)
+{
+    size_t i = 1;
+    for (; i < sizeof(regName) && *regName != 0; i++);
+
+    return (i == sizeof (regName) - 1) ? 1 : 0;
 }
