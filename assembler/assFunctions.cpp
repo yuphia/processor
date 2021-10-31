@@ -228,19 +228,12 @@ enum compilationErrs getArgument (char* line, double* argument,
     if (pointerToArg == nullptr)
     {   
         return MISSED_ARGUMENT;    
-    } 
-
-    printSplitter ();
-    //printf ();i
-    printf ("argument in the beginning = %s\n", pointerToArg);
-
+    }  
     enum compilationErrs checkMem = isMemoryCommand (&pointerToArg, &isMemory);
     
     if (checkMem != NO_ERROR)
         return checkMem; 
     
-    printf ("\n\nin argDetec pointer to arg = %s\n", pointerToArg);
-
     enum compilationErrs checkImmAndReg = isImmRegDetection (pointerToArg, &isRegister,
                                                              &isImmidiate, argument, &reg);
 
@@ -250,28 +243,14 @@ enum compilationErrs getArgument (char* line, double* argument,
     if (isRegister == 1 && reg == WRONG_REG)
         return WRONG_REG_ERROR;
 
-    //printf ("regnum = %d", reg);
-    
-    printf ("isMem = %d\n", isMemory);
-    printf ("isReg = %d\n", isRegister);
-    printf ("isImm = %d\n", isImmidiate);
-    printSplitter ();
-
     fillFieldAndWrite();
-
-    //printf ("isMemory = %d\n", thisCmd.mem);   
-    //printf ("cmd = %d\n", thisCmd.cmd);
-    //write (thisCmd.cmd);
 
     return NO_ERROR;
 } 
 
 enum compilationErrs isMemoryCommand (char** line, bool* isMemory)
 {
-    char newLine[100] = "";
-
     size_t placeOfCurrEl = 0;
-    size_t realPlace = 0;
 
     char* openingBracket  = strchr (*line, '[');
     char* closingBracket  = strchr (*line, ']');
@@ -281,24 +260,21 @@ enum compilationErrs isMemoryCommand (char** line, bool* isMemory)
 
     if (bracketStatus != NO_ERROR)
         return bracketStatus;
-
+     
     if (openingBracket != nullptr)
     {
         *isMemory = true;
         for (; placeOfCurrEl < strlen (*line); placeOfCurrEl++)
         {
-            if (*line + placeOfCurrEl != openingBracket && 
-                *line + placeOfCurrEl != closingBracket)
+            if (*line + placeOfCurrEl == openingBracket || 
+                *line + placeOfCurrEl == closingBracket)
             {             
-            newLine [realPlace] = *(*line + placeOfCurrEl);
-            realPlace++;            
-            }
+            *(*line + placeOfCurrEl) = ' ';       
+            }        
         }
 
-        *line = newLine;
-
-        printf ("newLine = %s\n", *line);
-
+        *line = jumpToLastSpace (*line);
+    
         if (strchr (*line, '[') != nullptr || strchr (*line, ']') != nullptr)
             return EXTRA_BRACKETS;
     }
@@ -317,7 +293,7 @@ enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket)
     return NO_ERROR;
 }
 
-enum compilationErrs isImmRegDetection (char* const line, bool* isRegister,
+enum compilationErrs isImmRegDetection (char* line, bool* isRegister,
                                         bool* isImmidiate,
                                         double* arg, enum Reg* reg)
 {
@@ -325,31 +301,17 @@ enum compilationErrs isImmRegDetection (char* const line, bool* isRegister,
 
     runThrough++;
 
+    line = jumpToLastSpace (line);
+
     int checkPointer = 0;
-    printf ("\nrunThrough = %zu\n"
-            "line = %s\n"
-            "lineP = %p\n"
-            "sizeof line = %zu\n\n", runThrough, line, (void*)line, sizeof (line));
 
     char* regName = (char*)calloc (sizeof(line), sizeof (char));
     MY_ASSERT (regName != nullptr, "Pointer to regName equals nullptr\n");      
 
-    printf ("line pointer = %p\n"
-            "regName pointer = %p\n"
-            "regName = %s\n"
-            "line = %s\n\n", (void*)line, (void*)regName, regName, line);
-
-
-
-    sscanf (line, "%1sx+%lg%n", regName, arg, &checkPointer);
-    
-    //printf ("read symb = %d\n"
-    //        "line = %s\n", checkPointer, line);    
-    
-    if (checkPointer == 5)
+    sscanf (line, "%1sx+%n%lg", regName, &checkPointer, arg);         
+    if (checkPointer == 3 && *arg != poisonProc)
     {
         *reg = detectRegister (regName);
-        printf ("arg = %lg\n", *arg);
         if (*reg == WRONG_REG)
             return WRONG_REG_ERROR;
 
@@ -364,7 +326,7 @@ enum compilationErrs isImmRegDetection (char* const line, bool* isRegister,
     }
     
     sscanf (line, "%1sx%n", regName, &checkPointer);
-    if (checkPointer == 3)
+    if (checkPointer == 2)
     {
         *reg = detectRegister (regName);
         if (*reg == WRONG_REG)
@@ -414,4 +376,14 @@ bool isRegOk (char* regName)
     for (; i < sizeof(regName) && *regName != 0; i++);
 
     return (i == sizeof (regName) - 1) ? 1 : 0;
+}
+
+char* jumpToLastSpace (char* line)
+{
+    size_t thisSymbolPlace = 0;
+    for (; thisSymbolPlace < sizeof(line); thisSymbolPlace++)
+        if (*(line + thisSymbolPlace) != ' ')
+            return line + thisSymbolPlace;
+
+   return line + thisSymbolPlace; 
 }
