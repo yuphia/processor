@@ -191,7 +191,7 @@ void printErrorInfo (struct errorInfo* pInfo)
     printf ("\n\n%s\n", splitter);
     printf ("An error has occured while compiling\n");
     printf ("While compiling this command: %s\n", pInfo->line);
-    printf ("In line: %zu\n", pInfo->nLine); 
+    printf ("In line: %zu\n", pInfo->nLine + 1); 
 
     fflush (stdin);
 }
@@ -230,12 +230,16 @@ enum compilationErrs getArgument (char* line, double* argument,
         return MISSED_ARGUMENT;    
     } 
 
+    printSplitter ();
+    //printf ();i
+    printf ("argument in the beginning = %s\n", pointerToArg);
+
     enum compilationErrs checkMem = isMemoryCommand (&pointerToArg, &isMemory);
     
     if (checkMem != NO_ERROR)
         return checkMem; 
-
-    printf ("pointer to arg = %s\n", pointerToArg);
+    
+    printf ("\n\nin argDetec pointer to arg = %s\n", pointerToArg);
 
     enum compilationErrs checkImmAndReg = isImmRegDetection (pointerToArg, &isRegister,
                                                              &isImmidiate, argument, &reg);
@@ -249,6 +253,9 @@ enum compilationErrs getArgument (char* line, double* argument,
     //printf ("regnum = %d", reg);
     
     printf ("isMem = %d\n", isMemory);
+    printf ("isReg = %d\n", isRegister);
+    printf ("isImm = %d\n", isImmidiate);
+    printSplitter ();
 
     fillFieldAndWrite();
 
@@ -290,6 +297,8 @@ enum compilationErrs isMemoryCommand (char** line, bool* isMemory)
 
         *line = newLine;
 
+        printf ("newLine = %s\n", *line);
+
         if (strchr (*line, '[') != nullptr || strchr (*line, ']') != nullptr)
             return EXTRA_BRACKETS;
     }
@@ -308,7 +317,8 @@ enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket)
     return NO_ERROR;
 }
 
-enum compilationErrs isImmRegDetection (char* line, bool* isRegister, bool* isImmidiate,
+enum compilationErrs isImmRegDetection (char* const line, bool* isRegister,
+                                        bool* isImmidiate,
                                         double* arg, enum Reg* reg)
 {
     static size_t runThrough = 0;
@@ -317,23 +327,25 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister, bool* isIm
 
     int checkPointer = 0;
     printf ("\nrunThrough = %zu\n"
-            "read symb = %d\n"
-            "line = %s\n\n", runThrough, checkPointer, line);
+            "line = %s\n"
+            "lineP = %p\n"
+            "sizeof line = %zu\n\n", runThrough, line, (void*)line, sizeof (line));
 
-    char* regName = (char*)calloc (4, sizeof (char));
-     MY_ASSERT (regName != nullptr, "Pointer to regName equals nullptr\n");      
+    char* regName = (char*)calloc (sizeof(line), sizeof (char));
+    MY_ASSERT (regName != nullptr, "Pointer to regName equals nullptr\n");      
 
     printf ("line pointer = %p\n"
-            "regName = %p\n\n", (void*)line, (void*)regName);
-   
-    //printf ("read symb = %d\n"
-    //        "line = %s\n", checkPointer, line);
+            "regName pointer = %p\n"
+            "regName = %s\n"
+            "line = %s\n\n", (void*)line, (void*)regName, regName, line);
+
+
 
     sscanf (line, "%1sx+%lg%n", regName, arg, &checkPointer);
     
-    printf ("read symb = %d\n"
-            "line = %s\n", checkPointer, line);    
-
+    //printf ("read symb = %d\n"
+    //        "line = %s\n", checkPointer, line);    
+    
     if (checkPointer == 5)
     {
         *reg = detectRegister (regName);
@@ -364,17 +376,18 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister, bool* isIm
         return NO_ERROR;
     }
 
-    free (regName);
-
-    sscanf (line, "%lg%n", arg, &checkPointer);
-    if (checkPointer == 3)
+    sscanf (line, "%lg", arg);    
+    if (*arg != poisonProc)
     {
         if (*arg == poisonProc)
             return FORBIDDEN_ARGUMENT;
 
+        *isImmidiate = 1;        
+        free (regName);
         return NO_ERROR;
     }
 
+    free(regName);
     return MISSED_ARGUMENT;
 }
 

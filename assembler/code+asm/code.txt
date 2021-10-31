@@ -1,3 +1,6 @@
+push 5
+push ax
+push [ax]
 push [ax+5]
 push 15 
 push 17
