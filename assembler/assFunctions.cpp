@@ -2,11 +2,17 @@
 
 void getCode (FILE* const code, struct Text *codeText)
 {
+    MY_ASSERT (code != nullptr, "A mistake happened while opening code file\n");
+    MY_ASSERT (codeText != nullptr, "Pointer to codeText is equal to nullptr\n");
+    
     transitFileToLineArray (code, codeText);
 }
 
 struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText)
 {
+    MY_ASSERT (info != nullptr, "pointer to info struct is equal to nullptr\n");
+    MY_ASSERT (codeText != nullptr, "pointer to codeText equals nullptr\n");
+    
     size_t codeSize = codeText->nLines;
 
     for (size_t currLine = 0; currLine < codeSize; currLine++)
@@ -28,6 +34,8 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
 
 enum compilationErrs parseLine (struct Line* line)
 {
+    MY_ASSERT (line != nullptr, "pointer to line equals nullptr\n");
+
     char cmd[5] = "";
     double arg = poisonProc;
 
@@ -41,7 +49,9 @@ enum compilationErrs parseLine (struct Line* line)
 enum compilationErrs putToCode (char* cmd, char* line, double* arg)
 {
     FILE* const asmHere = fopen ("code+asm/asm.txt", "ab");
-    MY_ASSERT (asmHere != nullptr, "An error occurred while opening assembler file");
+    MY_ASSERT (asmHere != nullptr, "An error occurred while opening assembler file\n");
+    MY_ASSERT (line != nullptr, "Pointer to line array is nullptr\n");
+    MY_ASSERT (line != nullptr, "Pointer to arg is equal to nullptr\n");
 
     if (strcmp (cmd, "push") == 0)
     {
@@ -117,6 +127,8 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg)
 
 enum compilationErrs compileCode (struct Text *codeText)
 {
+    MY_ASSERT (codeText != nullptr, "Pointer to codeText is equal to nullptr\n");
+
     struct errorInfo info = {NO_ERROR, 0, nullptr};
     struct errorInfo* pInfo = nullptr;
     pInfo = compileCodeMain (&info, codeText);
@@ -188,6 +200,8 @@ enum compilationErrs compileCode (struct Text *codeText)
 
 void printErrorInfo (struct errorInfo* pInfo)
 {
+    MY_ASSERT (pInfo != nullptr, "Pointer to pInfo struct is equal to nullptr\n");
+
     printf ("\n\n%s\n", splitter);
     printf ("An error has occured while compiling\n");
     printf ("While compiling this command: %s\n", pInfo->line);
@@ -204,6 +218,7 @@ void printSplitter ()
 
 char* skipCmd (char* str)
 {
+    MY_ASSERT (str != nullptr, "Pointer to str is equal to nullptr\n");
     size_t currentSymbol = 0;
     for (; currentSymbol < strlen (str) && *(str + currentSymbol) != ' ';
                                                              currentSymbol++);     
@@ -217,6 +232,10 @@ char* skipCmd (char* str)
 enum compilationErrs getArgument (char* line, double* argument, 
                                   enum commands cmd, FILE* const asmHere)
 {
+    MY_ASSERT (line != nullptr, "Pointer to line is equal to nullptr\n");
+    MY_ASSERT (argument != nullptr, "Pointer to argument is equal to nullptr\n");
+    MY_ASSERT (asmHere != nullptr, "An error occurred while opening asmHere file\n");
+
     char* pointerToArg = skipCmd (line);
     //printf ("pointer to argument = %p", (void*) pointerToArg);
     bool isMemory    = false;
@@ -250,6 +269,10 @@ enum compilationErrs getArgument (char* line, double* argument,
 
 enum compilationErrs isMemoryCommand (char** line, bool* isMemory)
 {
+    MY_ASSERT (line != nullptr, "pointer to pointer to line is equal to nullptr\n");
+    MY_ASSERT (*line != nullptr, "pointer to line is equal to nullptr\n");
+    MY_ASSERT (isMemory != nullptr, "pointer to isMemory is equal to nullptr\n");
+    
     size_t placeOfCurrEl = 0;
 
     char* openingBracket  = strchr (*line, '[');
@@ -297,6 +320,12 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister,
                                         bool* isImmidiate,
                                         double* arg, enum Reg* reg)
 {
+    MY_ASSERT (line != nullptr, "Pointer to line is equal to nullptr\n");
+    MY_ASSERT (isRegister != nullptr, "Pointer to isRegister is equal to nullptr\n");
+    MY_ASSERT (isImmidiate != nullptr, "Pointer to isImmidiate is equal to nullptr\n");
+    MY_ASSERT (arg != nullptr, "Pointer to arg is equal to nullptr\n");
+    MY_ASSERT (reg != nullptr, "Pointer to reg is equal to nullptr\n");
+    
     static size_t runThrough = 0;
 
     runThrough++;
@@ -355,6 +384,8 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister,
 
 enum Reg detectRegister (char* regName)
 {
+    MY_ASSERT (regName != nullptr, "pointer to regName is equal to nullptr\n");
+
     if (isRegOk (regName))
         return WRONG_REG;
 
@@ -372,6 +403,8 @@ enum Reg detectRegister (char* regName)
 
 bool isRegOk (char* regName)
 {
+    MY_ASSERT (regName != nullptr, "pointer to regName is equal to nullptr\n");
+ 
     size_t i = 1;
     for (; i < sizeof(regName) && *regName != 0; i++);
 
@@ -380,6 +413,8 @@ bool isRegOk (char* regName)
 
 char* jumpToLastSpace (char* line)
 {
+    MY_ASSERT (line != nullptr, "pointer to line is equal to nullptr\n");
+
     size_t thisSymbolPlace = 0;
     for (; thisSymbolPlace < sizeof(line); thisSymbolPlace++)
         if (*(line + thisSymbolPlace) != ' ')
