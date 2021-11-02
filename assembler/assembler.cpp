@@ -27,10 +27,16 @@ int main()
     free (codeText.textArray);
     freeArrayLines (codeText.lines);
 
-    /*cmdField thisCmd = {0, 0, 1, PUSH};
-    printf ("cmd = %d", thisCmd.cmd + thisCmd.mem*2*2*2*2*2*2*2 + 
-                                      thisCmd.reg*2*2*2*2*2*2*2*2 + 
-                                      thisCmd.imm*2*2*2*2*2*2); */
+    //printf ("mul = %d\n"
+    //       "bit = %d\n",
+    //        );
+
+/*    cmdField thisCmd = {1, 0, 1, PUSH};
+    printf ("mul = %d\n", thisCmd.cmd + thisCmd.mem*2*2*2*2*2*2 + 
+                                        thisCmd.reg*2*2*2*2*2*2*2 + 
+                                        thisCmd.imm*2*2*2*2*2); 
+
+    printf ("bit = %d\n", thisCmd.cmd | 0b01000000*thisCmd.mem | 0b10000000*thisCmd.reg | 0b00100000*thisCmd.imm);*/
 
     return 0;
 }

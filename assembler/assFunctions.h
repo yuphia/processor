@@ -14,9 +14,9 @@
 
 #define FILL_FIELD_AND_WRITE()\
             struct cmdField thisCmd = {isRegister, isMemory, isImmidiate, cmd};\
-            WRITE (thisCmd.cmd +        thisCmd.mem*2*2*2*2*2*2 +\
-                                        thisCmd.reg*2*2*2*2*2*2*2 +\
-                                        thisCmd.imm*2*2*2*2*2);            
+            WRITE (thisCmd.cmd + (((thisCmd.cmd | 0b01000000*thisCmd.mem) \
+                                               | 0b10000000*thisCmd.reg) \
+                                               | 0b00100000*thisCmd.imm))            
 
 #define $ printf ("line = %d\n", __LINE__);\
           fflush (stdout);
