@@ -49,6 +49,9 @@ enum compilationErrs parseLine (struct Line* line)
 enum compilationErrs putToCode (char* cmd, char* line, double* arg)
 {
     FILE* const asmHere = fopen ("code+asm/asm.txt", "ab");
+
+    if (asmHere == nullptr)
+        return OUTPUT_FILE_ERROR;
     MY_ASSERT (asmHere != nullptr, "An error occurred while opening assembler file\n");
     MY_ASSERT (line != nullptr, "Pointer to line array is nullptr\n");
     MY_ASSERT (line != nullptr, "Pointer to arg is equal to nullptr\n");
@@ -187,6 +190,11 @@ enum compilationErrs compileCode (struct Text *codeText)
         case WRONG_REG_ERROR:
             printf ("Check your register name in this line (accepted register names:"
                     "ax, bx, cx, dx)\n");
+            printSplitter();
+            break;
+
+        case OUTPUT_FILE_ERROR:
+            printf ("Couldn't open the output file\n");
             printSplitter();
             break;
 
@@ -422,3 +430,14 @@ char* jumpToLastSpace (char* line)
 
    return line + thisSymbolPlace; 
 }
+
+bool prepareAsm()
+{
+    FILE* temp = fopen ("code+asm/asm.txt", "wb");
+
+    if (temp == nullptr)
+        return 0;
+
+    return 1;
+}
+

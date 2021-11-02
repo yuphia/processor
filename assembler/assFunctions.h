@@ -33,7 +33,8 @@ enum compilationErrs
         STRAY_CLOSE_BRACKET = 6,
         EXTRA_BRACKETS = 7,
         WRONG_REG_ERROR = 8,
-        FORBIDDEN_ARGUMENT = 9        
+        FORBIDDEN_ARGUMENT = 9,
+        OUTPUT_FILE_ERROR = 10        
         };
 
 enum Reg
@@ -97,5 +98,7 @@ void printSplitter ();
 const double poisonProc = 0xFFFFFF;
 static const char splitter[] = 
             "============================================================";
+
+bool prepareAsm();
 
 #endif

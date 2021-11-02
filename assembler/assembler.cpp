@@ -3,9 +3,19 @@
 int main()
 {
     FILE* const code = fopen ("code+asm/code.txt", "rb");
-    fclose (fopen ("code+asm/asm.txt", "wb"));    
+    if (prepareAsm() == 0)
+    {
+        printf ("Couldn't open the output file with asm\n");
+        return 1;
+    }    
+
     MY_ASSERT (code != nullptr, "An error occurred while opening code file");
-    
+    if (code == nullptr)
+    {
+        printf ("Couldn't open the file with code\n");
+        return 1;
+    }
+
     struct Text codeText = {};
 
     fflush (stdout);
