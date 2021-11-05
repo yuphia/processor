@@ -78,7 +78,8 @@ enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket);
 
 enum compilationErrs getArgument (char* line, double* argument,
                                   enum commands cmd, FILE* const asmHere,
-                                  bool isMemAllowed, bool isRegAllowed, bool isImmAllowed);
+                                  bool isMemAllowed, bool isRegAllowed, bool isImmAllowed,
+                                  bool isNoArgAllowed);
 
 enum compilationErrs isImmRegDetection (char* line, bool* isRegister, 
                                         bool* isImmidiate,

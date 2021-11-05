@@ -68,7 +68,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const 
         
     if (strcmp (cmd, "push") == 0)
     {
-        enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere, 1, 1, 1);
+        enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere, 1, 1, 1, 0);
         if (argErr != NO_ERROR)
             return argErr;        
 
@@ -78,7 +78,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const 
 
     else if (strcmp (cmd, "pop") == 0)
     {                 
-        enum compilationErrs argErr = getArgument (line, arg, POP, asmHere, 0, 1, 0);
+        enum compilationErrs argErr = getArgument (line, arg, POP, asmHere, 0, 1, 0, 1);
         if (argErr != NO_ERROR)        
             return argErr;
     }
@@ -239,7 +239,8 @@ char* skipCmd (char* str)
 
 enum compilationErrs getArgument (char* line, double* argument, 
                                   enum commands cmd, FILE* const asmHere,
-                                  bool isMemAllowed, bool isRegAllowed, bool isImmAllowed)
+                                  bool isMemAllowed, bool isRegAllowed, bool isImmAllowed,
+                                  bool isNoArgAllowed)
 {
     MY_ASSERT (line != nullptr, "Pointer to line is equal to nullptr\n");
     MY_ASSERT (argument != nullptr, "Pointer to argument is equal to nullptr\n");
@@ -253,10 +254,16 @@ enum compilationErrs getArgument (char* line, double* argument,
 
     enum Reg reg = WRONG_REG;
 
-    if (pointerToArg == nullptr)
+    if (pointerToArg == nullptr && isNoArgAllowed == 0)
     {   
         return MISSED_ARGUMENT;    
-    }  
+    } 
+    else if (pointerToArg == nullptr || checkCmdForComment (line) == NO_ERROR)
+    {
+        FILL_FIELD_AND_WRITE();
+        return NO_ERROR;
+    }
+
     enum compilationErrs checkMem = isMemoryCommand (&pointerToArg, &isMemory);
     
     if (checkMem != NO_ERROR)
@@ -265,16 +272,16 @@ enum compilationErrs getArgument (char* line, double* argument,
     enum compilationErrs checkImmAndReg = isImmRegDetection (pointerToArg, &isRegister,
                                                              &isImmidiate, argument, &reg);
 
+    if (isRegister > isRegAllowed ||
+        isMemory > isMemAllowed   || 
+        isImmidiate > isImmAllowed)
+        return FORBIDDEN_ARGUMENT;
+
     if (checkImmAndReg != NO_ERROR)
         return checkImmAndReg;
     
     if (isRegister == 1 && reg == WRONG_REG)
             return WRONG_REG_ERROR;
-
-    if (isRegister > isRegAllowed ||
-        isMemory > isMemAllowed   || 
-        isImmidiate > isImmAllowed)
-        return FORBIDDEN_ARGUMENT;
 
     FILL_FIELD_AND_WRITE();
 
@@ -478,3 +485,4 @@ enum compilationErrs checkCmdForComment (char* line)
 
     return NO_ERROR;
 }
+
