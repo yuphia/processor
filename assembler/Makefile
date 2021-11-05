@@ -10,7 +10,7 @@ WARNS =  -Weffc++ -Waggressive-loop-optimizations -Wc++0x-compat -Wc++11-compat 
 		 -Wopenmp-simd -Woverloaded-virtual -Wpacked -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-promo -Wstack-usage=8192 -Wstrict-null-sentinel -Wstrict-overflow=2 \
 		 -Wsuggest-attribute=noreturn -Wsuggest-final-methods -Wsuggest-final-types -Wsuggest-override -Wswitch-default -Wswitch-enum -Wsync-nand -Wundef -Wunreachable-code \
 		 -Wunused -Wuseless-cast -Wvariadic-macros -Wno-literal-suffix -Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -Wall -Wextra -Wpedantic  \
-		 -Wno-error=unused-function #-Wsigned-conversion -Wfloat-equal  -Wconversion
+		 -Wno-error=unused-function -Wsign-conversion #-Wconversion #-Wfloat-equal
 
 ENABLE_WERROR = -Werror
 ENABLE_PIE = -pie

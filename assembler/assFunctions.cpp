@@ -9,122 +9,114 @@ void getCode (FILE* const code, struct Text *codeText)
 }
 
 struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText)
-{
+{ 
+    FILE* const asmHere = fopen ("code+asm/asm.txt", "wb");
+    if (asmHere == nullptr)
+    {
+        info->compilationStatus = OUTPUT_FILE_ERROR;
+        return info;
+    }
+
     MY_ASSERT (info != nullptr, "pointer to info struct is equal to nullptr\n");
     MY_ASSERT (codeText != nullptr, "pointer to codeText equals nullptr\n");
     
     size_t codeSize = codeText->nLines;
 
-    for (size_t currLine = 0; currLine < codeSize; currLine++)
-    {
-        enum compilationErrs compilationStatusIn = 
-            parseLine ((codeText->lines) + currLine);
+    for (size_t currLine = 0; 
+         currLine < codeSize;
+         currLine++)
+    {   
+        enum compilationErrs compilationStatusIn = NO_ERROR;
+        
+        if (!isComment(((codeText->lines) + currLine)->line))        
+            compilationStatusIn = parseLine ((codeText->lines) + currLine, asmHere);
 
         if (compilationStatusIn != NO_ERROR)
         {
             info->compilationStatus = compilationStatusIn;
             info->nLine = currLine;
             info->line  = ((codeText->lines) + currLine)->line;
+
+            fclose (asmHere);
             return info;    
         }
     }
 
+    fclose (asmHere);
     return info;
 }
 
-enum compilationErrs parseLine (struct Line* line)
+enum compilationErrs parseLine (struct Line* line, FILE* const asmHere)
 {
     MY_ASSERT (line != nullptr, "pointer to line equals nullptr\n");
 
-    char cmd[5] = "";
+    char cmd[100] = "";
     double arg = poisonProc;
 
     sscanf (line->line, "%s", cmd);/*%lg*/
     
-    enum compilationErrs compilationStatus = putToCode (cmd, line->line, &arg);
+    enum compilationErrs compilationStatus = putToCode (cmd, line->line, &arg, asmHere);
            
     return compilationStatus;
 }
 
-enum compilationErrs putToCode (char* cmd, char* line, double* arg)
+enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const asmHere)
 {
-    FILE* const asmHere = fopen ("code+asm/asm.txt", "ab");
-
-    if (asmHere == nullptr)
-        return OUTPUT_FILE_ERROR;
-    MY_ASSERT (asmHere != nullptr, "An error occurred while opening assembler file\n");
     MY_ASSERT (line != nullptr, "Pointer to line array is nullptr\n");
     MY_ASSERT (line != nullptr, "Pointer to arg is equal to nullptr\n");
-
+        
     if (strcmp (cmd, "push") == 0)
     {
-        enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere);
+        enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere, 1, 1, 1);
         if (argErr != NO_ERROR)
-        {
-            printf ("argErr = %d", argErr);
-            fclose (asmHere);
-            return argErr;
-        }
+            return argErr;        
 
-        if (fwrite (arg, sizeof(double), 1, asmHere) != 1)
-        {
-            fclose (asmHere);
-            return WRITING_ERROR;
-        }
+        if (fwrite (arg, sizeof(double), 1, asmHere) != 1)        
+            return WRITING_ERROR;        
     }
 
     else if (strcmp (cmd, "pop") == 0)
     {                 
-        WRITE (POP);          
-
-        if (*arg != poisonProc)
-        {
-            fclose (asmHere);
-            return TOO_MANY_ARGUMENTS;
-        }
+        enum compilationErrs argErr = getArgument (line, arg, POP, asmHere, 0, 1, 0);
+        if (argErr != NO_ERROR)        
+            return argErr;
     }
     
     else if (strcmp (cmd, "hlt") == 0)
     {
         WRITE (HALT); 
         
-        if (*arg != poisonProc)
-        {
-            fclose (asmHere);
-            return TOO_MANY_ARGUMENTS;
-        }
+        if (*arg != poisonProc)        
+            return TOO_MANY_ARGUMENTS;        
+        
+        return checkCmdForComment (line);
     }
 
     else if (strcmp (cmd, "add") == 0)
     {
         WRITE (ADD);
-        if (*arg != poisonProc)
-        {
-            fclose (asmHere);
-            return TOO_MANY_ARGUMENTS;
-        }
+        if (*arg != poisonProc)        
+            return TOO_MANY_ARGUMENTS;        
+
+        return checkCmdForComment (line);
     }
 
     else if (strcmp (cmd, "mul") == 0)
     {
         WRITE (MUL);
                 
-        if (*arg != poisonProc)
-        {
-            fclose (asmHere);
-            return TOO_MANY_ARGUMENTS;
-        }
+        if (*arg != poisonProc)        
+            return TOO_MANY_ARGUMENTS;      
+
+        return checkCmdForComment (line);
     }
 
     else
     {
         fprintf (asmHere, "Error compiling, unrecognised command\n");
-
-        fclose (asmHere);
         return UNRECOGNISED_COMMAND;
     }
 
-    fclose (asmHere);
     return NO_ERROR;
 }
 
@@ -134,6 +126,7 @@ enum compilationErrs compileCode (struct Text *codeText)
 
     struct errorInfo info = {NO_ERROR, 0, nullptr};
     struct errorInfo* pInfo = nullptr;
+
     pInfo = compileCodeMain (&info, codeText);
 
     if (pInfo->compilationStatus != NO_ERROR)
@@ -159,7 +152,8 @@ enum compilationErrs compileCode (struct Text *codeText)
 
         case FORBIDDEN_ARGUMENT:
             printf ("You are using an argument that can't be used as an input"                    
-                    " (check poisonProc constant)\n");
+                    " (check poisonProc constant)\n"
+                    "Also you might be using an unsuitable argument for a command\n");
             printSplitter();
             break;
 
@@ -195,6 +189,11 @@ enum compilationErrs compileCode (struct Text *codeText)
 
         case OUTPUT_FILE_ERROR:
             printf ("Couldn't open the output file\n");
+            printSplitter();
+            break;
+
+        case RUBBISH_IN_LINE:
+            printf ("Some stray characters in line after a valid command\n");
             printSplitter();
             break;
 
@@ -238,7 +237,8 @@ char* skipCmd (char* str)
 }
 
 enum compilationErrs getArgument (char* line, double* argument, 
-                                  enum commands cmd, FILE* const asmHere)
+                                  enum commands cmd, FILE* const asmHere,
+                                  bool isMemAllowed, bool isRegAllowed, bool isImmAllowed)
 {
     MY_ASSERT (line != nullptr, "Pointer to line is equal to nullptr\n");
     MY_ASSERT (argument != nullptr, "Pointer to argument is equal to nullptr\n");
@@ -268,7 +268,12 @@ enum compilationErrs getArgument (char* line, double* argument,
         return checkImmAndReg;
     
     if (isRegister == 1 && reg == WRONG_REG)
-        return WRONG_REG_ERROR;
+            return WRONG_REG_ERROR;
+
+    if (isRegister > isRegAllowed ||
+        isMemory > isMemAllowed   || 
+        isImmidiate > isImmAllowed)
+        return FORBIDDEN_ARGUMENT;
 
     FILL_FIELD_AND_WRITE();
 
@@ -335,6 +340,7 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister,
     MY_ASSERT (reg != nullptr, "Pointer to reg is equal to nullptr\n");
     
     static size_t runThrough = 0;
+    char buffForComment [100] = "";
 
     runThrough++;
 
@@ -345,7 +351,7 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister,
     char* regName = (char*)calloc (sizeof(line), sizeof (char));
     MY_ASSERT (regName != nullptr, "Pointer to regName equals nullptr\n");      
 
-    sscanf (line, "%1sx+%n%lg", regName, &checkPointer, arg);         
+    sscanf (line, "%1sx+%n%lg%s", regName, &checkPointer, arg, buffForComment);         
     if (checkPointer == 3 && *arg != poisonProc)
     {
         *reg = detectRegister (regName);
@@ -355,6 +361,10 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister,
         if (*arg == poisonProc)
             return FORBIDDEN_ARGUMENT;
 
+        line = jumpToLastSpace (buffForComment);
+        if (*line != ';' && *line != '\0')
+            return RUBBISH_IN_LINE;
+
         *isRegister  = 1;
         *isImmidiate = 1;
         
@@ -362,12 +372,16 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister,
         return NO_ERROR;
     }
     
-    sscanf (line, "%1sx%n", regName, &checkPointer);
+    sscanf (line, "%1sx%n%s", regName, &checkPointer, buffForComment);
     if (checkPointer == 2)
     {
         *reg = detectRegister (regName);
         if (*reg == WRONG_REG)
             return WRONG_REG_ERROR;
+
+        line = jumpToLastSpace (buffForComment);
+        if (*line != ';' && *line != '\0')
+            return RUBBISH_IN_LINE;
 
         *isRegister = 1;
         
@@ -375,11 +389,15 @@ enum compilationErrs isImmRegDetection (char* line, bool* isRegister,
         return NO_ERROR;
     }
 
-    sscanf (line, "%lg", arg);    
+    sscanf (line, "%lg%s", arg, buffForComment);    
     if (*arg != poisonProc)
     {
         if (*arg == poisonProc)
             return FORBIDDEN_ARGUMENT;
+
+        line = jumpToLastSpace (buffForComment);
+        if (*line != ';' && *line != '\0')
+            return RUBBISH_IN_LINE;
 
         *isImmidiate = 1;        
         free (regName);
@@ -428,7 +446,7 @@ char* jumpToLastSpace (char* line)
         if (*(line + thisSymbolPlace) != ' ')
             return line + thisSymbolPlace;
 
-   return line + thisSymbolPlace; 
+    return line + thisSymbolPlace; 
 }
 
 bool prepareAsm()
@@ -441,3 +459,21 @@ bool prepareAsm()
     return 1;
 }
 
+bool isComment (char* line)
+{
+    line = jumpToLastSpace (line);
+    if (*line == ';')
+        return true;
+
+    return false;
+}
+
+enum compilationErrs checkCmdForComment (char* line)
+{
+    line = skipCmd (line);
+    line = jumpToLastSpace (line);
+    if (*line != ';' && *line != '\0')
+        return RUBBISH_IN_LINE;
+
+    return NO_ERROR;
+}

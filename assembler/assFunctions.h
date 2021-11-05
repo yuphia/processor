@@ -34,7 +34,8 @@ enum compilationErrs
         EXTRA_BRACKETS = 7,
         WRONG_REG_ERROR = 8,
         FORBIDDEN_ARGUMENT = 9,
-        OUTPUT_FILE_ERROR = 10        
+        OUTPUT_FILE_ERROR = 10,
+        RUBBISH_IN_LINE = 11,        
         };
 
 enum Reg
@@ -63,20 +64,20 @@ struct cmdField
 
 void getCode (FILE* const code, struct Text *codeText);
 
-enum compilationErrs parseLine (struct Line* line);
+enum compilationErrs parseLine (struct Line* line, FILE* const asmHere);
 
 struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText);
 
 enum compilationErrs compileCode     (struct Text *codeText);
 
-enum compilationErrs putToCode (char* cmd, 
-                                char* line, double* arg);
+enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const asmHere);
 
 enum compilationErrs isMemoryCommand (char** line, bool* isMemory);
 enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket);
 
 enum compilationErrs getArgument (char* line, double* argument,
-                                  enum commands cmd, FILE* const asmHere);
+                                  enum commands cmd, FILE* const asmHere,
+                                  bool isMemAllowed, bool isRegAllowed, bool isImmAllowed);
 
 enum compilationErrs isImmRegDetection (char* line, bool* isRegister, 
                                         bool* isImmidiate,
@@ -89,6 +90,9 @@ char* skipCmd (char* str);
 bool isMemoryCommand (char* line);
 
 char* jumpToLastSpace (char* line);
+
+bool isComment (char* line);
+enum compilationErrs checkCmdForComment (char* line);
 
 bool isRegOk (char* regName);
 
