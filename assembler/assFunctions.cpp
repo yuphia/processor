@@ -285,6 +285,9 @@ enum compilationErrs getArgument (char* line, double* argument,
 
     FILL_FIELD_AND_WRITE();
 
+    if (isRegister == 1)
+        WRITE_REGISTER();
+
     return NO_ERROR;
 } 
 

@@ -12,6 +12,12 @@
         char thisCmdN = cmd;\
         fwrite (&thisCmdN, sizeof(char), 1, asmHere);
 
+#define WRITE_REGISTER()\
+        {\
+            char regTemp = (char)reg;\
+            fwrite (&regTemp, sizeof(char), 1, asmHere);\
+        }
+
 #define FILL_FIELD_AND_WRITE()\
             struct cmdField thisCmd = {isRegister, isMemory, isImmidiate, cmd};\
             WRITE (thisCmd.cmd + (((thisCmd.cmd | 0b01000000*thisCmd.mem) \
