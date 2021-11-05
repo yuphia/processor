@@ -1,8 +1,13 @@
 #include "assFunctions.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    FILE* const code = fopen ("code+asm/code.txt", "rb");    
+    if (argc != 3)
+    {
+        printf ("You forgot to put the asm and code files in the run setup\n");
+        return 1;
+    }
+    FILE* const code = fopen (argv[1], "rb");    
 
     MY_ASSERT (code != nullptr, "An error occurred while opening code file");
     if (code == nullptr)
@@ -17,7 +22,7 @@ int main()
     getCode (code, &codeText);
     fclose (code);    
 
-    compileCode (&codeText);
+    compileCode (&codeText, argv[2]);
 
     free (codeText.textArray);
     freeArrayLines (codeText.lines);

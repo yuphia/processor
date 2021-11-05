@@ -8,9 +8,10 @@ void getCode (FILE* const code, struct Text *codeText)
     transitFileToLineArray (code, codeText);
 }
 
-struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText)
+struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText,
+                                   char* codeFileName)
 { 
-    FILE* const asmHere = fopen ("code+asm/asm.txt", "wb");
+    FILE* const asmHere = fopen (codeFileName, "wb");
     if (asmHere == nullptr)
     {
         info->compilationStatus = OUTPUT_FILE_ERROR;
@@ -120,14 +121,14 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const 
     return NO_ERROR;
 }
 
-enum compilationErrs compileCode (struct Text *codeText)
+enum compilationErrs compileCode (struct Text *codeText, char* codeFileName)
 {
     MY_ASSERT (codeText != nullptr, "Pointer to codeText is equal to nullptr\n");
 
     struct errorInfo info = {NO_ERROR, 0, nullptr};
     struct errorInfo* pInfo = nullptr;
 
-    pInfo = compileCodeMain (&info, codeText);
+    pInfo = compileCodeMain (&info, codeText, codeFileName);
 
     if (pInfo->compilationStatus != NO_ERROR)
         printErrorInfo (pInfo);

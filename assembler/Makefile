@@ -25,12 +25,14 @@ SOURCES = assembler.cpp ./../lib/StrFuncs/strlibMy.cpp ./../lib/SortingAlg/sort.
 
 DIRECTORIES = -I ./../lib/SortingAlg/ -I ./../lib/StrFuncs/ -I ./../lib/fileInput/ -I ./../lib/MistakeHandling/ -I ./../lib/commands/
 
+FILES_FOR_ASM = code+asm/code.asm code+asm/asm.bin
+
 DIR_BUILD = build
 DIR_RELEASE = $(DIR_BUILD)/release
 DIR_DEBUG   = $(DIR_BUILD)/debug
 
 
-OBJ_FILE_PATH_RELEASE = $(DIR_RELEASE)/assembler.out
+OBJ_FILE_PATH_RELEASE = $(DIR_RELEASE)/assembler.out 
 OBJECTS_RELEASE       = -o $(OBJ_FILE_PATH_RELEASE)
 
 OBJ_FILE_PATH_DEBUG   = $(DIR_DEBUG)/assembler.out
@@ -55,8 +57,19 @@ clean:
 	rm -rf $(DIR_BUILD)/*
 
 run: 
-	./$(OBJ_FILE_PATH_RELEASE)
+	./$(OBJ_FILE_PATH_RELEASE) $(FILES_FOR_ASM)
+
+runName:
+	./$(OBJ_FILE_PATH_RELEASE) 
 
 rundbg:
-	./$(OBJ_FILE_PATH_DEBUG)
+	./$(OBJ_FILE_PATH_DEBUG)   $(FILES_FOR_ASM)
 
+rundbgName:
+	./$(OBJ_FILE_PATH_DEBUG) 
+
+openCode:
+	vim code+asm/code.asm
+
+openAsm:
+	ghex code+asm/asm.bin

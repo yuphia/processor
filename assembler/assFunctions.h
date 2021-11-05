@@ -66,9 +66,10 @@ void getCode (FILE* const code, struct Text *codeText);
 
 enum compilationErrs parseLine (struct Line* line, FILE* const asmHere);
 
-struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText);
+struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText, 
+                                   char* codeFileName);
 
-enum compilationErrs compileCode     (struct Text *codeText);
+enum compilationErrs compileCode     (struct Text *codeText, char* codeFileName);
 
 enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const asmHere);
 

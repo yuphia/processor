@@ -1,5 +1,0 @@
-pop bx
-;pop [cx + 6]
-pop 5
-
-
