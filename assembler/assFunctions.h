@@ -27,6 +27,7 @@
 #define $ printf ("line = %d\n", __LINE__);\
           fflush (stdout);
 
+const size_t START_LABELS_SIZE = 1;
 
 enum compilationErrs 
         {
@@ -42,6 +43,10 @@ enum compilationErrs
         FORBIDDEN_ARGUMENT = 9,
         OUTPUT_FILE_ERROR = 10,
         RUBBISH_IN_LINE = 11,        
+        NO_LABEL_IN_JUMP = 12,
+        NOT_A_LABEL = 13,
+        UNKNOWN_LABEL = 14, 
+        TEMP_MEMORY_ERROR = 15
         };
 
 enum Reg
@@ -68,16 +73,28 @@ struct cmdField
         unsigned char cmd : 5;
         };
 
+struct label
+        {
+        char* label;
+        size_t labelPointsTo;        
+        };
+
 void getCode (FILE* const code, struct Text *codeText);
 
-enum compilationErrs parseLine (struct Line* line, FILE* const asmHere);
+enum compilationErrs parseLine (struct Line* line, FILE* const asmHere,
+                                size_t currLine, struct label ***labels,
+                                bool isWriteAllowed, 
+                                size_t* currLabel, size_t* sizeOfLabels);
 
 struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText, 
                                    char* codeFileName);
 
 enum compilationErrs compileCode     (struct Text *codeText, char* codeFileName);
 
-enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const asmHere);
+enum compilationErrs putToCode (char* cmd, char* line, double* arg, 
+                                FILE* const asmHere, size_t currLine,
+                                struct label ***labels, bool isWriteAllowed,
+                                size_t* currLabel, size_t* sizeOfLabels);
 
 enum compilationErrs isMemoryCommand (char** line, bool* isMemory);
 enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket);
@@ -100,7 +117,7 @@ bool isMemoryCommand (char* line);
 char* jumpToLastSpace (char* line);
 
 bool isComment (char* line);
-enum compilationErrs checkCmdForComment (char* line);
+enum compilationErrs checkCmdForComment (char* line, bool isCmdInside);
 
 bool isRegOk (char* regName);
 
@@ -113,4 +130,18 @@ static const char splitter[] =
 
 bool prepareAsm();
 
+enum compilationErrs insertLabel (char* line, struct label **labels, 
+                                  enum commands cmd, FILE* const asmHere, 
+                                  size_t sizeOfLabels);
+
+enum compilationErrs detectLabel (char* line, size_t whichLine,
+                                  struct label ***labels, size_t currLabel,
+                                  size_t *sizeOfLabels);
+
+bool isLabel (char* line);
+bool callocTheInside (struct label** labels);
+void removeSpaces (char** line);
+int countSpacesInFront (char* line);
+
+void freeAllLabels (struct label** labels, size_t sizeOfLabels);
 #endif

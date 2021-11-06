@@ -8,5 +8,6 @@ enum commands
     PUSH = 1,
     POP  = 2,
     ADD  = 3,
-    MUL  = 4
+    MUL  = 4,
+    JMP = 5
     };

@@ -11,6 +11,16 @@ void getCode (FILE* const code, struct Text *codeText)
 struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText,
                                    char* codeFileName)
 { 
+    struct label **labels = (struct label**)calloc (START_LABELS_SIZE, 
+                                                    sizeof (struct label*));
+     
+    static size_t currLabel = 0;
+    static size_t sizeOfLabels = START_LABELS_SIZE;          
+
+    char tempArr[] = "";
+    struct label tempLabel = {tempArr, 0};
+    *(labels) = &tempLabel;        
+
     FILE* const asmHere = fopen (codeFileName, "wb");
     if (asmHere == nullptr)
     {
@@ -30,7 +40,9 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
         enum compilationErrs compilationStatusIn = NO_ERROR;
         
         if (!isComment(((codeText->lines) + currLine)->line))        
-            compilationStatusIn = parseLine ((codeText->lines) + currLine, asmHere);
+            compilationStatusIn = parseLine ((codeText->lines) + currLine, asmHere, 
+                                            currLine + 1, &labels, 0,
+                                            &currLabel, &sizeOfLabels);
 
         if (compilationStatusIn != NO_ERROR)
         {
@@ -42,31 +54,69 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
             return info;    
         }
     }
+    
+    currLabel = 0;
+    for (size_t currLine = 0; 
+         currLine < codeSize;
+         currLine++)
+    {   
+        enum compilationErrs compilationStatusIn = NO_ERROR;
+        
+        if (!isComment(((codeText->lines) + currLine)->line))        
+            compilationStatusIn = parseLine ((codeText->lines) + currLine, asmHere, 
+                                            currLine + 1, &labels, 1,
+                                            &currLabel, &sizeOfLabels);
 
+        if (compilationStatusIn != NO_ERROR)
+        {
+            info->compilationStatus = compilationStatusIn;
+            info->nLine = currLine;
+            info->line  = ((codeText->lines) + currLine)->line;
+
+            fclose (asmHere);
+            freeAllLabels (labels, sizeOfLabels);
+            free (labels);
+            return info;    
+        }
+    }
+
+
+    free (labels);
     fclose (asmHere);
     return info;
 }
 
-enum compilationErrs parseLine (struct Line* line, FILE* const asmHere)
+enum compilationErrs parseLine (struct Line* line, FILE* const asmHere,
+                                size_t currLine, struct label ***labels, 
+                                bool isWriteAllowed, 
+                                size_t *currLabel, size_t *sizeOfLabels)
 {
     MY_ASSERT (line != nullptr, "pointer to line equals nullptr\n");
 
     char cmd[100] = "";
     double arg = poisonProc;
-
+    
     sscanf (line->line, "%s", cmd);/*%lg*/
     
-    enum compilationErrs compilationStatus = putToCode (cmd, line->line, &arg, asmHere);
+    enum compilationErrs compilationStatus = putToCode (cmd, line->line, &arg,
+                                                        asmHere, currLine, 
+                                                        labels, isWriteAllowed,
+                                                        currLabel, sizeOfLabels);
            
     return compilationStatus;
 }
 
-enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const asmHere)
+enum compilationErrs putToCode (char* cmd, char* line, double* arg, 
+                                FILE* const asmHere, size_t currLine,
+                                struct label ***labels, bool isWriteAllowed,
+                                size_t *currLabel, size_t *sizeOfLabels)
 {
     MY_ASSERT (line != nullptr, "Pointer to line array is nullptr\n");
     MY_ASSERT (line != nullptr, "Pointer to arg is equal to nullptr\n");
-        
-    if (strcmp (cmd, "push") == 0)
+       
+     
+
+    if (strcmp (cmd, "push") == 0 && isWriteAllowed)
     {
         enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere, 1, 1, 1, 0);
         if (argErr != NO_ERROR)
@@ -76,46 +126,61 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg, FILE* const 
             return WRITING_ERROR;        
     }
 
-    else if (strcmp (cmd, "pop") == 0)
+    else if (strcmp (cmd, "pop") == 0 && isWriteAllowed)
     {                 
         enum compilationErrs argErr = getArgument (line, arg, POP, asmHere, 0, 1, 0, 1);
         if (argErr != NO_ERROR)        
             return argErr;
     }
     
-    else if (strcmp (cmd, "hlt") == 0)
+    else if (strcmp (cmd, "hlt") == 0 && isWriteAllowed)
     {
         WRITE (HALT); 
         
         if (*arg != poisonProc)        
             return TOO_MANY_ARGUMENTS;        
         
-        return checkCmdForComment (line);
+        return checkCmdForComment (line, 1);
     }
 
-    else if (strcmp (cmd, "add") == 0)
+    else if (strcmp (cmd, "add") == 0 && isWriteAllowed)
     {
         WRITE (ADD);
         if (*arg != poisonProc)        
             return TOO_MANY_ARGUMENTS;        
 
-        return checkCmdForComment (line);
+        return checkCmdForComment (line, 1);
     }
 
-    else if (strcmp (cmd, "mul") == 0)
+    else if (strcmp (cmd, "mul") == 0 && isWriteAllowed)
     {
         WRITE (MUL);
                 
         if (*arg != poisonProc)        
             return TOO_MANY_ARGUMENTS;      
 
-        return checkCmdForComment (line);
+        return checkCmdForComment (line, 1);
     }
 
-    else
+    else if (strcmp (cmd, "jmp") == 0 && isWriteAllowed)
     {
-        fprintf (asmHere, "Error compiling, unrecognised command\n");
-        return UNRECOGNISED_COMMAND;
+        enum compilationErrs tempErr = insertLabel (line, *labels, JMP, 
+                                                    asmHere, *sizeOfLabels);
+
+        return tempErr;
+    }
+
+    else if (!isWriteAllowed)
+    { 
+        enum compilationErrs tempErr = detectLabel (line, currLine, labels, 
+                                                    *currLabel, sizeOfLabels);
+        if (tempErr == NO_ERROR)
+            (*currLabel)++;
+        
+        if (tempErr != UNRECOGNISED_COMMAND)
+            return tempErr;
+
+        return NO_ERROR;
     }
 
     return NO_ERROR;
@@ -198,6 +263,26 @@ enum compilationErrs compileCode (struct Text *codeText, char* codeFileName)
             printSplitter();
             break;
 
+        case NO_LABEL_IN_JUMP:
+            printf ("Jump requires a label as an argument\n");
+            printSplitter();
+            break;
+
+        case NOT_A_LABEL:
+            printf ("This is not a label\n");
+            printSplitter();
+            break;
+
+        case UNKNOWN_LABEL:
+            printf ("Trying to jump to an unknown label\n");
+            printSplitter();
+            break;
+
+        case TEMP_MEMORY_ERROR:
+            printf ("Memory reallocation error for labels array\n");
+            printSplitter();
+            break;
+
         default:
             printf ("Unknown error\n");
             break;
@@ -258,7 +343,7 @@ enum compilationErrs getArgument (char* line, double* argument,
     {   
         return MISSED_ARGUMENT;    
     } 
-    else if (pointerToArg == nullptr || checkCmdForComment (line) == NO_ERROR)
+    else if (pointerToArg == nullptr || checkCmdForComment (line, 1) == NO_ERROR)
     {
         FILL_FIELD_AND_WRITE();
         return NO_ERROR;
@@ -472,6 +557,7 @@ bool prepareAsm()
 
 bool isComment (char* line)
 {
+    MY_ASSERT (line != nullptr, "pointer to line is nullptr");
     line = jumpToLastSpace (line);
     if (*line == ';')
         return true;
@@ -479,13 +565,192 @@ bool isComment (char* line)
     return false;
 }
 
-enum compilationErrs checkCmdForComment (char* line)
+enum compilationErrs checkCmdForComment (char* line, bool isCmdInside)
 {
-    line = skipCmd (line);
+    MY_ASSERT (line != nullptr, "Pointer to line is nullptr");
+    if  (isCmdInside)
+    { 
+        char* tempLine = skipCmd (line);
+        if (tempLine == nullptr)
+            return NO_ERROR;
+
+        line = tempLine;
+    }
+    
+    char* pointerToComment = strchr (line, ';');
     line = jumpToLastSpace (line);
+    if (pointerToComment == nullptr && isLabel (line) == 1)
+    {        
+        return NO_ERROR;
+    }
+    else if (pointerToComment != nullptr)
+    {
+        *pointerToComment = '\0';
+        
+        if (isLabel (line))       
+            return NO_ERROR;
+
+        line = jumpToLastSpace (line);
+        char* tempLine = skipCmd (line);               
+        if (tempLine != nullptr)
+        {
+            if (isLabel (tempLine))
+                return NO_ERROR;
+        }
+
+        *pointerToComment = ';';
+    }
+
     if (*line != ';' && *line != '\0')
         return RUBBISH_IN_LINE;
 
+    *line = '\0';
     return NO_ERROR;
 }
 
+enum compilationErrs detectLabel (char* line, size_t whichLine, 
+                                  struct label ***labels, size_t currLabel,
+                                  size_t *sizeOfLabels)
+{
+    MY_ASSERT (line != nullptr, "Pointer to line is nullptr");
+    MY_ASSERT (labels != nullptr, "Pointer to labels is nullptr");
+    MY_ASSERT (sizeOfLabels != nullptr, "Pointer to sizeOfLabels is nullptr");
+    MY_ASSERT (*labels != nullptr, "Pointer to *labels is nullptr");
+
+    enum compilationErrs commentStatus = checkCmdForComment (line, 0);
+    line = jumpToLastSpace (line);
+    
+    if (isLabel (line) != 0 && commentStatus == NO_ERROR)
+    {
+        if (currLabel >= *sizeOfLabels)
+        {
+            *sizeOfLabels += 1;
+            *labels = (struct label**)realloc (*labels, 
+                            sizeof (*labels) + sizeof(struct label*));
+
+            if (callocTheInside (*labels + currLabel) == 0)
+                return TEMP_MEMORY_ERROR;
+        }
+        
+        (*(*labels + currLabel))->label = line;
+        (*(*labels + currLabel))->labelPointsTo = whichLine;    
+
+        return NO_ERROR;
+    }
+    else
+    {                
+        return UNRECOGNISED_COMMAND;
+    }
+}
+
+enum compilationErrs insertLabel (char* line, struct label **labels, 
+                                  enum commands cmd, FILE* const asmHere,
+                                  size_t sizeOfLabels)
+{  
+    MY_ASSERT (line != nullptr, "Pointer to line is nullptr");
+    MY_ASSERT (labels != nullptr, "Pointer to labels is nullptr");
+    MY_ASSERT (*labels != nullptr, "Pointer to *labels is nullptr");
+
+    line = jumpToLastSpace (line);
+    line = skipCmd (line);    
+    if (line == nullptr)
+        return NO_LABEL_IN_JUMP;
+    
+    enum compilationErrs tempErr = checkCmdForComment (line, 0);
+    line = jumpToLastSpace (line); 
+    
+    if (tempErr != NO_ERROR)            
+        return NOT_A_LABEL;
+    
+
+    size_t currLabel = 0;
+    for (; currLabel < sizeOfLabels; currLabel++)
+    {
+        removeSpaces (&line);
+        removeSpaces (&((*(labels + currLabel))->label));
+        
+        if (strcmp ((*(labels + currLabel))->label, line) == 0)
+        {
+            
+            WRITE (cmd);
+            fwrite (&((*(labels + currLabel))->labelPointsTo), sizeof (char), 1, asmHere);
+        }        
+    }    
+    
+    return NO_ERROR;
+}
+
+bool isLabel (char* line)
+{
+    MY_ASSERT (line != nullptr, "Pointer to line is nullptr"); 
+
+    char* pointer = strchr (line, '\0');
+
+    while (pointer > line && isalpha (*pointer) == 0)
+    {
+        if (*pointer == ':')
+        {
+            char* labelPointer = strchr (line, ':');
+            
+            int numberOfSpaces = countSpacesInFront (line); 
+            line = jumpToLastSpace (line);
+
+            for (size_t i = 0; i < (size_t)(labelPointer - line - numberOfSpaces); i++)
+                if (*(line + i) == ' ')
+                    return false;
+            return true;
+        }
+
+        pointer--;
+    }
+
+    return false;
+}
+
+bool callocTheInside (struct label** labels)
+{
+    MY_ASSERT (labels != nullptr, "Pointer to labels = nullptr");
+
+    *labels = (struct label*)calloc (1, sizeof(struct label));
+    return (*labels == nullptr) ? 0 : 1;
+}
+
+void removeSpaces (char** line)
+{
+    MY_ASSERT (line != nullptr, "Pointer to line = nullptr");
+    MY_ASSERT (*line != nullptr, "Pointer to *line = nullptr");
+
+    *line = jumpToLastSpace (*line);
+
+    size_t realPoint = 0;
+
+    for (size_t i = 0; i < strlen (*line); i++)
+    {
+        if (*(*line + i) != ' ')
+        {
+            *(*line + realPoint) = *(*line + i);
+            realPoint++;
+        }
+    }
+    *(*line + realPoint) = '\0';
+}
+
+
+
+int countSpacesInFront (char* line)
+{
+    MY_ASSERT (line != nullptr, "pointer to line is equal to nullptr\n");
+
+    size_t thisSymbolPlace = 0;
+    for (; thisSymbolPlace < sizeof(line); thisSymbolPlace++)
+        if (*(line + thisSymbolPlace) != ' ')
+            return thisSymbolPlace;
+
+    return thisSymbolPlace; 
+}
+
+void freeAllLabels (struct label** labels, size_t sizeOfLabels)
+{
+    for (size_t i = 0; i < sizeOfLabels; i++)
+        free ((*labels) + i);
+}
