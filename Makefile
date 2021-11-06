@@ -21,9 +21,10 @@ DISABLE_DEBUG = -D NDEBUG_STK
 
 NUM_ERRORS = -fmax-errors=1
 
-SOURCES = ./assembler/assembler.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./assembler/assFunctions.cpp
+SOURCES_ASM = ./assembler/assembler.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./assembler/assFunctions.cpp
+SOURCES_DISASM = ./disassembler/disassembler.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./assembler/assFunctions.cpp
 
-DIRECTORIES = -I ./lib/SortingAlg/ -I ./lib/StrFuncs/ -I ./lib/fileInput/ -I ./lib/MistakeHandling/ -I ./lib/commands/ -I ./assembler
+DIRECTORIES = -I ./lib/SortingAlg/ -I ./lib/StrFuncs/ -I ./lib/fileInput/ -I ./lib/MistakeHandling/ -I ./lib/commands/ -I ./assembler -I ./disassembler
 
 FILES_FOR_ASM = assembler/examples/code.asm assembler/examples/asm.bin
 
@@ -31,30 +32,41 @@ DIR_BUILD_ASM = buildAsm
 DIR_RELEASE_ASM = $(DIR_BUILD_ASM)/release
 DIR_DEBUG_ASM   = $(DIR_BUILD_ASM)/debug
 
-
 OBJ_FILE_PATH_RELEASE_ASM = $(DIR_RELEASE_ASM)/assembler.out 
 OBJECTS_RELEASE_ASM       = -o $(OBJ_FILE_PATH_RELEASE_ASM)
 
 OBJ_FILE_PATH_DEBUG_ASM   = $(DIR_DEBUG_ASM)/assembler.out
-OBJECTS_DEBUG_ASM         = -o $(OBJ_FILE_PATH_DEBUG_ASM) 
+OBJECTS_DEBUG_ASM         = -o $(OBJ_FILE_PATH_DEBUG_ASM)
+
+DIR_BUILD_DISASM = buildDisasm
+DIR_RELEASE_DISASM = $(DIR_BUILD_DISASM)/release
+DIR_DEBUG_DISASM   = $(DIR_BUILD_DISASM)/debug
+
+OBJ_FILE_PATH_RELEASE_DISASM = $(DIR_RELEASE_DISASM)/disassembler.out 
+OBJECTS_RELEASE_DISASM       = -o $(OBJ_FILE_PATH_RELEASE_DISASM)
+
+OBJ_FILE_PATH_DEBUG_DISASM   = $(DIR_DEBUG_DISASM)/disassembler.out
+OBJECTS_DEBUG_DISASM         = -o $(OBJ_FILE_PATH_DEBUG_DISASM) 
+
+FILES_FOR_DISASM = assembler/examples/asm.bin disassembler/examples/disasm.asm
 
 COMPILER = g++
 
-all: releaseAsm
+all: releaseDisasm
 
 createLog:
 	touch log.txt
 
 releaseAsm:
 	mkdir -p $(DIR_RELEASE_ASM)
-	$(COMPILER) $(STANDARD) $(WARNS)                                                       $(DISABLE_DEBUG) $(DIRECTORIES) $(SOURCES) $(OBJECTS_RELEASE_ASM) 	
+	$(COMPILER) $(STANDARD) $(WARNS)                                                       $(DISABLE_DEBUG) $(DIRECTORIES) $(SOURCES_ASM) $(OBJECTS_RELEASE_ASM) 	
 
 debugAsm:
 	mkdir -p $(DIR_DEBUG_ASM)
-	$(COMPILER) $(ENABLE_WERROR) $(ENABLE_GDB) $(STANDARD) $(WARNS) $(WARNSF) $(ENABLE_PIE) $(ENABLE_DEBUG) $(DIRECTORIES) $(SOURCES) $(OBJECTS_DEBUG_ASM) $(NUM_ERRORS)
+	$(COMPILER) $(ENABLE_WERROR) $(ENABLE_GDB) $(STANDARD) $(WARNS) $(WARNSF) $(ENABLE_PIE) $(ENABLE_DEBUG) $(DIRECTORIES) $(SOURCES_ASM) $(OBJECTS_DEBUG_ASM) $(NUM_ERRORS)
 
 cleanAsm:
-	rm -rf $(DIR_BUILD)/*
+	rm -rf $(DIR_BUILD_ASM)/*
 
 runAsm:
 	./$(OBJ_FILE_PATH_RELEASE_ASM) $(FILES_FOR_ASM)
@@ -67,6 +79,29 @@ rundbgAsm:
 
 rundbgAsmName:
 	./$(OBJ_FILE_PATH_DEBUG_ASM) 
+
+releaseDisasm:
+	mkdir -p $(DIR_RELEASE_DISASM)
+	$(COMPILER) $(STANDARD) $(WARNS)                                                       $(DISABLE_DEBUG) $(DIRECTORIES) $(SOURCES_DISASM) $(OBJECTS_RELEASE_DISASM) 	
+
+debugDisasm:
+	mkdir -p $(DIR_DEBUG_DISASM)
+	$(COMPILER) $(ENABLE_WERROR) $(ENABLE_GDB) $(STANDARD) $(WARNS) $(WARNSF) $(ENABLE_PIE) $(ENABLE_DEBUG) $(DIRECTORIES) $(SOURCES_DISASM) $(OBJECTS_DEBUG_DISASM) $(NUM_ERRORS)
+
+cleanDisasm:
+	rm -rf $(DIR_BUILD_DISASM)/*
+
+runDisasm:
+	./$(OBJ_FILE_PATH_RELEASE_DISASM) $(FILES_FOR_DISASM)
+
+runNameDisasm:
+	./$(OBJ_FILE_PATH_RELEASE_DISASM) 
+
+rundbgDisasm:
+	./$(OBJ_FILE_PATH_DEBUG_DISASM)   $(FILES_FOR_DISASM)
+
+rundbgNameDisasm:
+	./$(OBJ_FILE_PATH_DEBUG_DISASM)
 
 openCode:
 	vim assembler/examples/code.asm

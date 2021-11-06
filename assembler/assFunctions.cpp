@@ -372,7 +372,9 @@ enum compilationErrs getArgument (char* line, double* argument,
 
     if (isRegister == 1 && reg == WRONG_REG)
             return WRONG_REG_ERROR;
-
+/*
+    printf ("cmd = %d\n"
+            "cmdAfter = %d\n", cmd, );*/
     FILL_FIELD_AND_WRITE();
 
     if (isRegister == 1)
