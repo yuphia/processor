@@ -78,7 +78,6 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
             info->line  = ((codeText->lines) + currLine)->line;
 
             fclose (asmHere);
-            printf ("sizeoflabels = %zu\n", sizeOfLabels);
 
             freeAllLabels (labels, sizeOfLabels);
             free (labels);
@@ -634,9 +633,6 @@ enum compilationErrs detectLabel (char* line, size_t whichLine,
             *labels = (struct label**)realloc (*labels,
                                            (*sizeOfLabels)*sizeof(struct label*));
 
-            printf ("sizeoflabels = %zu\n", *sizeOfLabels);
-            printf ("currLabel = %zu\n", currLabel);
-
             if (callocTheInside (*labels + *sizeOfLabels - 1) == 0)
                 return TEMP_MEMORY_ERROR;
         }
@@ -760,13 +756,6 @@ int countSpacesInFront (char* line)
 
 void freeAllLabels (struct label** labels, size_t sizeOfLabels)
 {
-    $
-    $
-    printf ("sizeoflabels = %zu\n", sizeOfLabels);
     for (size_t i = 0; i < sizeOfLabels; i++)
-    {
-        $
-        printf ("i = %zu\n", i);
         free (*(labels + i));
-    }
 }

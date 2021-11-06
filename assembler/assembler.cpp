@@ -7,9 +7,8 @@ int main(int argc, char* argv[])
         printf ("You forgot to put the asm and code files in the run setup\n");
         return 1;
     }
-    FILE* const code = fopen (argv[1], "rb");    
 
-    MY_ASSERT (code != nullptr, "An error occurred while opening code file");
+    FILE* const code = fopen (argv[1], "rb");    
     if (code == nullptr)
     {
         printf ("Couldn't open the file with code\n");
