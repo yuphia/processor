@@ -6,7 +6,7 @@ int main (int argc, char *argv[])
     {
         printf ("You forgot to put filenames in the setup command.\n"
                 "Please use the setup as follows.\n"
-                "%s machCode.asm output.bin\n", argv[0]);
+                "%s input.bin output.asm\n", argv[0]);
         return 1;
     }    
 

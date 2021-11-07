@@ -4,7 +4,9 @@ int main(int argc, char* argv[])
 {
     if (argc != 3)
     {
-        printf ("You forgot to put the asm and code files in the run setup\n");
+        printf ("You forgot to put the asm and code files in the run setup\n"
+                "You should use the command as follows\n"
+                "%s input.asm output.bin\n", argv[0]);
         return 1;
     }
 
