@@ -4,7 +4,9 @@ int main (int argc, char *argv[])
 {
     if (argc != 3)
     {
-        printf ("You forgot to put filenames\n");
+        printf ("You forgot to put filenames in the setup command.\n"
+                "Please use the setup as follows.\n"
+                "%s machCode.asm output.bin\n", argv[0]);
         return 1;
     }    
 
