@@ -23,7 +23,7 @@ NUM_ERRORS = -fmax-errors=1
 
 SOURCES_ASM = ./assembler/assembler.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./assembler/assFunctions.cpp
 SOURCES_DISASM = ./disassembler/disassembler.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./disassembler/disassemblerCmds.cpp
-SOURCES_PROC   = ./processor/processor.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./processor/processorCmds.cpp	
+SOURCES_PROC   = ./processor/processor.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./processor/processorCmds.cpp ./lib/guard/ultimateGuard.cpp ./lib/stackFuncs/stackFunctions.cpp
 
 DIRECTORIES = -I ./lib/SortingAlg/ -I ./lib/StrFuncs/ -I ./lib/fileInput/ -I ./lib/MistakeHandling/ -I ./lib/commands/ -I ./assembler -I ./disassembler -I ./processor -I ./lib/guard/ -I ./lib/stackFuncs/
 
