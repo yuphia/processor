@@ -7,7 +7,6 @@
     If DEBUG_SOFT flag is defined does the same but doesn't abort the programm
 
     If NDEBUG flag is defined does nothing**/
-
 #ifndef ULTIMATEGUARD_H
 
 #define ULTIMATEGUARD_H 1
@@ -21,6 +20,7 @@ template <typename data>
 void dumpStk (struct stk<data>* stk, FILE* const logFileConst);
 
 size_t dumpCounter();
+hash_t rotl (hash_t n);
 
 template <typename data>
 enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info);
@@ -45,11 +45,11 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
 
     if (stk->buffer == nullptr && stk->lastError == REALLOCNOMEM)
     {
-        LOGDUMP (logFileConst, stk, 0, "Pointer to buffer equals nullptr. Latest reallocation has failed", 1); 
+        LOGDUMP (logFileConst, stk, 0, "Pointer to buffer equals nullptr. Latest reallocation has failed", 1);
         fclose (logFileConst);
         return REALLOCNOMEM;
     }
-    
+
     if (stk->buffer == nullptr && stk->capacity != 0)
     {
         LOGDUMP (logFileConst, stk, 0, "Pointer to buffer equals nullptr. Latest allocation has failed\n", 1);
@@ -64,7 +64,7 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
         fclose (logFileConst);
         return CANARYL_DEAD;
     }
-    
+
     if (stk->canaryR != canaryR)
     {
         LOGDUMP (logFileConst, stk, 0, "Right canary in struct is dead, Most likely the stack"
@@ -72,15 +72,15 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
         fclose (logFileConst);
         return CANARYR_DEAD;
     }
-  
+
     if (stkCanaryBufferL != canaryBufferL)
     {
         LOGDUMP (logFileConst, stk, 0, "Left canary in buffer is dead, Most likely the stack"
                                        " buffer elements have been accessed from the outside", 1);
-        fclose (logFileConst); 
+        fclose (logFileConst);
         return CANARYL_BUFF_STK_DEAD;
     }
-    
+
     if (stkCanaryBufferR != canaryBufferR)
     {
         LOGDUMP (logFileConst, stk, 0, "Right canary in buffer is dead, Most likely the stack"
@@ -88,7 +88,7 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
         fclose (logFileConst);
         return CANARYR_BUFF_STK_DEAD;
     }
-  
+
     if (stk->lastError == STKUNDERFLOW)
     {
         LOGDUMP (logFileConst, stk, 0, "Most likely you have called more pops than needed, be careful", 1);
@@ -97,7 +97,7 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
     }
 
     if (stk->capacity == 0 && stk->buffer == nullptr)
-    {    
+    {
         LOGDUMP (logFileConst, stk, 0, "The capacity of the stack equal to null - which means it has likely been destructed", 1);
         fclose (logFileConst);
         free (stk->buffer);
@@ -106,9 +106,9 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
 
     for (size_t i = stk->nElement; i < stk->capacity; i++)
         if (stkBuffer (i) != stk->poison)
-        {         
+        {
             LOGDUMP (logFileConst, stk, 0, "Poison values have failed - it means your stack has been accessed with non-stack function", 1);
-            fclose (logFileConst);   
+            fclose (logFileConst);
             free (stk->buffer);
             return STKOUTSIDEACCESS;
         }
@@ -132,7 +132,7 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
 
     fclose (logFileConst);
 
-    return NOERR; 
+    return NOERR;
 }
 
 /*hash_t countHash (struct Stk* stk)
@@ -147,12 +147,12 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
 void prepareLogs ()
 {
     FILE* const temp = fopen ("logs/log.txt", "w");
-    
+
     MY_ASSERT (temp != nullptr, "Couldn't prepare logs (open the log.txt)");
     fclose (temp);
 }
 
-static hash_t rotl (hash_t n)
+hash_t rotl (hash_t n)
 {
     unsigned d = 13;
     n *= d;
@@ -200,7 +200,7 @@ void dumpStk (struct stk<data>* stk, FILE* const logFileConst)
     for (size_t i = 0; i < stk->capacity; i++)
     {
         //fprintf (logFileConst,  "buffer[%zu] = %d\n", i, stkBuffer (i));
-        stk->dumper (stk, i, logFileConst); 
+        stk->dumper (stk, i, logFileConst);
 
         if (i == stk->nElement - 1 && stk->nElement != stk->capacity)
             fprintf (logFileConst, "\n"
@@ -208,7 +208,7 @@ void dumpStk (struct stk<data>* stk, FILE* const logFileConst)
                      "but they lie in the bufferized region"
                      "\n"
                      "\n");
-    }    
+    }
 
     fprintf (logFileConst, "\nRcanary = %llx\n", stk->canaryR);
     fprintf (logFileConst, "Rcanary in buffer = %llx\n", stkCanaryBufferR);
