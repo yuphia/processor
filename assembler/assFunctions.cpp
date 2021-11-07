@@ -127,8 +127,6 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
         if (argErr != NO_ERROR)
             return argErr;
 
-        if (fwrite (arg, sizeof(double), 1, asmHere) != 1)
-            return WRITING_ERROR;
     }
 
     else if (strcmp (cmd, "pop") == 0 && isWriteAllowed)
@@ -379,6 +377,10 @@ enum compilationErrs getArgument (char* line, double* argument,
 
     if (isRegister == 1)
         WRITE_REGISTER();
+
+    if (isImmidiate == 1)
+        if (fwrite (argument, sizeof(double), 1, asmHere) != 1)
+            return WRITING_ERROR;
 
     return NO_ERROR;
 }

@@ -22,7 +22,7 @@ DISABLE_DEBUG = -D NDEBUG_STK
 NUM_ERRORS = -fmax-errors=1
 
 SOURCES_ASM = ./assembler/assembler.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./assembler/assFunctions.cpp
-SOURCES_DISASM = ./disassembler/disassembler.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./assembler/assFunctions.cpp
+SOURCES_DISASM = ./disassembler/disassembler.cpp ./lib/StrFuncs/strlibMy.cpp ./lib/SortingAlg/sort.cpp ./lib/fileInput/fileInputTreatment.cpp ./disassembler/disassemblerCmds.cpp
 
 DIRECTORIES = -I ./lib/SortingAlg/ -I ./lib/StrFuncs/ -I ./lib/fileInput/ -I ./lib/MistakeHandling/ -I ./lib/commands/ -I ./assembler -I ./disassembler
 
@@ -108,3 +108,6 @@ openCode:
 
 openAsm:
 	ghex assembler/examples/asm.bin
+
+openDisasm:
+	vim disassembler/examples/disasm.asm
