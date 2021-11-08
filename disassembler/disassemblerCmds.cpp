@@ -156,6 +156,26 @@ enum errCodes translateCode (unsigned char* code,
                    ip++;
                    break;
 
+            case JAE:
+                   fprintf (disasmHere, "jae %d\n", *(code + ip + 1));
+                   ip++;
+                   break;
+
+            case JB:
+                   fprintf (disasmHere, "jb %d\n", *(code + ip + 1));
+                   ip++;
+                   break;
+
+            case JBE:
+                   fprintf (disasmHere, "jbe %d\n", *(code + ip + 1));
+                   ip++;
+                   break;
+
+            case JE:
+                   fprintf (disasmHere, "je %d\n", *(code + ip + 1));
+                   ip++;
+                   break;
+
             default:
                    return UNRECOGNISED_COMMAND;
                    break;

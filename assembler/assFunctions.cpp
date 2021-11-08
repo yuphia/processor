@@ -246,6 +246,62 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
         return tempErr;       
     }
 
+    else if (strcmp (cmd, "ja") == 0)
+    {
+        enum compilationErrs tempErr = NO_ERROR;
+        if (isWriteAllowed)
+            tempErr = insertLabel (line, *labels, JA,
+                                                    asmHere, *sizeOfLabels);
+        
+        (*ip)++;
+        return tempErr;       
+    }
+
+    else if (strcmp (cmd, "jae") == 0)
+    {
+        $
+        enum compilationErrs tempErr = NO_ERROR;
+        if (isWriteAllowed)
+            tempErr = insertLabel (line, *labels, JAE,
+                                                    asmHere, *sizeOfLabels);
+        
+        (*ip)++;
+        return tempErr;       
+    }
+
+    else if (strcmp (cmd, "jb") == 0)
+    {
+        enum compilationErrs tempErr = NO_ERROR;
+        if (isWriteAllowed)
+            tempErr = insertLabel (line, *labels, JB,
+                                                    asmHere, *sizeOfLabels);
+        
+        (*ip)++;
+        return tempErr;       
+    }
+
+    else if (strcmp (cmd, "jbe") == 0)
+    {
+        enum compilationErrs tempErr = NO_ERROR;
+        if (isWriteAllowed)
+            tempErr = insertLabel (line, *labels, JBE,
+                                                    asmHere, *sizeOfLabels);
+        
+        (*ip)++;
+        return tempErr;       
+    }
+
+    else if (strcmp (cmd, "je") == 0)
+    {
+        enum compilationErrs tempErr = NO_ERROR;
+        if (isWriteAllowed)
+            tempErr = insertLabel (line, *labels, JE,
+                                                    asmHere, *sizeOfLabels);
+        
+        (*ip)++;
+        return tempErr;       
+    }   
+
     else if (!isWriteAllowed)
     {
         enum compilationErrs tempErr = detectLabel (line, labels, *currLabel, 

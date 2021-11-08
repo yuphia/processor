@@ -1,12 +1,17 @@
-in
-in
+in ;3
+in ;4
 
-ja metka:
-pop ax
-pop bx
+pop ax ;4
+pop bx ;3
+
+push bx ;4
+push ax
+
+jb metka:
 
 push ax
 push bx
+
 print
 print
 

@@ -14,5 +14,9 @@ enum commands
     IN   = 7,
     CALL = 8,
     RET  = 9,
-    JA   = 10
+    JA   = 10,
+    JAE  = 11,
+    JB   = 12,
+    JBE  = 13,
+    JE   = 14
     };

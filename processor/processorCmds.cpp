@@ -237,10 +237,65 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    else
                        ip++;
 
-                   break; 
+                   break;
 
-            default:
-                   $
+            case JAE:
+                   popStk<double>(&proc.stackProc, &tempPop1);
+                   popStk<double>(&proc.stackProc, &tempPop2);
+
+                   if (tempPop2 >= tempPop1)
+                   {
+                       ip = *(code + ip + 1);
+                       ip--;
+                   }
+                   else
+                       ip++;
+
+                   break;
+                
+            case JB:
+                   popStk<double>(&proc.stackProc, &tempPop1);
+                   popStk<double>(&proc.stackProc, &tempPop2);
+
+                   if (tempPop2 < tempPop1)
+                   {
+                       ip = *(code + ip + 1);
+                       ip--;
+                   }
+                   else
+                       ip++;
+
+                   break;
+
+            case JBE:
+                   popStk<double>(&proc.stackProc, &tempPop1);
+                   popStk<double>(&proc.stackProc, &tempPop2);
+
+                   if (tempPop2 <= tempPop1)
+                   {
+                       ip = *(code + ip + 1);
+                       ip--;
+                   }
+                   else
+                       ip++;
+
+                   break;
+
+            case JE:
+                   popStk<double>(&proc.stackProc, &tempPop1);
+                   popStk<double>(&proc.stackProc, &tempPop2);
+
+                   if (tempPop2 - tempPop1 < 1e-10)
+                   {
+                       ip = *(code + ip + 1);
+                       ip--;
+                   }
+                   else
+                       ip++;
+
+                   break;
+
+            default:                   
                    dtorStk<int> (&proc.stackCalls);
                    dtorStk<double> (&proc.stackProc);
                    return UNRECOGNISED_COMMAND;
