@@ -18,5 +18,8 @@ enum commands
     JAE  = 11,
     JB   = 12,
     JBE  = 13,
-    JE   = 14
+    JE   = 14, 
+    DIV  = 15,
+    SUB  = 16,
+    JNE  = 17
     };

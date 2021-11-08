@@ -182,6 +182,22 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                                     tempPop1 + tempPop2);
                    break;
 
+            case DIV:
+                   popStk<double> (&proc.stackProc, &tempPop1);
+                   popStk<double> (&proc.stackProc, &tempPop2);
+
+                   pushStk<double> (&proc.stackProc,
+                                    tempPop1 / tempPop2);
+                   break;
+
+            case SUB:
+                   popStk<double> (&proc.stackProc, &tempPop1);
+                   popStk<double> (&proc.stackProc, &tempPop2);
+
+                   pushStk<double> (&proc.stackProc,
+                                    tempPop1 - tempPop2);
+                   break;
+
             case MUL:
                    popStk<double> (&proc.stackProc, &tempPop1);
                    popStk<double> (&proc.stackProc, &tempPop2);
@@ -229,7 +245,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
-                   if (tempPop2 > tempPop1)
+                   if (tempPop1 > tempPop2)
                    {
                        ip = *(code + ip + 1);
                        ip--;
@@ -243,7 +259,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
-                   if (tempPop2 >= tempPop1)
+                   if (tempPop1 >= tempPop2)
                    {
                        ip = *(code + ip + 1);
                        ip--;
@@ -257,7 +273,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
-                   if (tempPop2 < tempPop1)
+                   if (tempPop1 < tempPop2)
                    {
                        ip = *(code + ip + 1);
                        ip--;
@@ -271,7 +287,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
-                   if (tempPop2 <= tempPop1)
+                   if (tempPop1 <= tempPop2)
                    {
                        ip = *(code + ip + 1);
                        ip--;
@@ -285,7 +301,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
-                   if (tempPop2 - tempPop1 < 1e-10)
+                   if (tempPop1 - tempPop2 < 1e-10 && tempPop2 - tempPop1 > -1e-10)
                    {
                        ip = *(code + ip + 1);
                        ip--;
@@ -295,7 +311,24 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
 
                    break;
 
-            default:                   
+            case JNE:
+                   popStk<double>(&proc.stackProc, &tempPop1);
+                   popStk<double>(&proc.stackProc, &tempPop2);
+
+                   printf ("jne = %d", tempPop1 - tempPop2 >= 1e-10 || tempPop2 - tempPop1 <= -1e-10);
+                   if (tempPop1 - tempPop2 >= 1e-10 || tempPop2 - tempPop1 <= -1e-10)
+                   {
+                       $
+                       ip = *(code + ip + 1);
+                       ip--;
+                   }
+                   else
+                       ip++;
+
+                   break;
+
+            default:                  
+                   printf ("command = %d\n", *(code+ip)); 
                    dtorStk<int> (&proc.stackCalls);
                    dtorStk<double> (&proc.stackProc);
                    return UNRECOGNISED_COMMAND;

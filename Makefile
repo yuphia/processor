@@ -146,3 +146,24 @@ openAsm:
 openDisasm:
 	vim disassembler/examples/disasm.asm
 
+openSquare:
+	vim assembler/examples/square.asm
+
+asmSquare:
+	./$(OBJ_FILE_PATH_RELEASE_ASM) assembler/examples/square.asm assembler/examples/square.bin
+
+runSquare:
+	./$(OBJ_FILE_PATH_RELEASE_PROC)  assembler/examples/square.bin
+
+disasmSquare:
+	./$(OBJ_FILE_PATH_RELEASE_DISASM) assembler/examples/square.bin disassembler/examples/squareDis.asm
+
+opAsmSquare:
+	ghex assembler/examples/square.bin
+
+opDisSquare:
+	vim disassembler/examples/squareDis.asm
+
+
+
+

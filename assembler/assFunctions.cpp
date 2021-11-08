@@ -120,6 +120,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
     MY_ASSERT (line != nullptr, "Pointer to line array is nullptr\n");
     MY_ASSERT (line != nullptr, "Pointer to arg is equal to nullptr\n");
 
+    line = jumpToLastSpace (line);
 
     (*ip)++;
     if (strcmp (cmd, "push") == 0)
@@ -159,7 +160,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             WRITE (ADD);
         }
 
-            if (*arg != poisonProc)
+        if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
 
         return checkCmdForComment (line, 1);
@@ -187,6 +188,8 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
 
         if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
+
+        return checkCmdForComment (line, 1);
     }
 
     else if (strcmp (cmd, "in") == 0 && isWriteAllowed)
@@ -198,6 +201,8 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
 
         if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
+
+        return checkCmdForComment (line, 1);
     }
 
     else if (strcmp (cmd, "jmp") == 0)
@@ -233,6 +238,8 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
 
         if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
+
+        return checkCmdForComment (line, 1);
     }
 
     else if (strcmp (cmd, "ja") == 0)
@@ -300,6 +307,43 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
         
         (*ip)++;
         return tempErr;       
+    }  
+
+    else if (strcmp (cmd, "jne") == 0)
+    {
+        enum compilationErrs tempErr = NO_ERROR;
+        if (isWriteAllowed)
+            tempErr = insertLabel (line, *labels, JNE,
+                                                    asmHere, *sizeOfLabels);
+        
+        (*ip)++;
+        return tempErr;       
+    }
+    
+    else if (strcmp (cmd, "sub") == 0)
+    {
+        if(isWriteAllowed)
+        {
+            WRITE (SUB);
+        }
+
+        if (*arg != poisonProc)
+            return TOO_MANY_ARGUMENTS;
+
+        return checkCmdForComment (line, 1);
+    }
+
+    else if (strcmp (cmd, "div") == 0)
+    {
+        if(isWriteAllowed)
+        {
+            WRITE (DIV);
+        }
+
+        if (*arg != poisonProc)
+            return TOO_MANY_ARGUMENTS;
+
+        return checkCmdForComment (line, 1);
     }   
 
     else if (!isWriteAllowed)
