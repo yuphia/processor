@@ -83,9 +83,9 @@ struct label
 void getCode (FILE* const code, struct Text *codeText);
 
 enum compilationErrs parseLine (struct Line* line, FILE* const asmHere,
-                                size_t currLine, struct label ***labels,
+                                struct label ***labels,
                                 bool isWriteAllowed, 
-                                size_t* currLabel, size_t* sizeOfLabels);
+                                size_t* currLabel, size_t* sizeOfLabels, size_t* ip);
 
 struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText, 
                                    char* codeFileName);
@@ -93,9 +93,9 @@ struct errorInfo *compileCodeMain (struct errorInfo*, struct Text *codeText,
 enum compilationErrs compileCode     (struct Text *codeText, char* codeFileName);
 
 enum compilationErrs putToCode (char* cmd, char* line, double* arg, 
-                                FILE* const asmHere, size_t currLine,
+                                FILE* const asmHere, 
                                 struct label ***labels, bool isWriteAllowed,
-                                size_t* currLabel, size_t* sizeOfLabels);
+                                size_t* currLabel, size_t* sizeOfLabels, size_t* ip);
 
 enum compilationErrs isMemoryCommand (char** line, bool* isMemory);
 enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket);
@@ -103,7 +103,7 @@ enum compilationErrs isBracketStructureOk (char* oBracket, char* cBracket);
 enum compilationErrs getArgument (char* line, double* argument,
                                   enum commands cmd, FILE* const asmHere,
                                   bool isMemAllowed, bool isRegAllowed, bool isImmAllowed,
-                                  bool isNoArgAllowed);
+                                  bool isNoArgAllowed, size_t* ip, bool isWriteAllowed);
 
 enum compilationErrs isImmRegDetection (char* line, bool* isRegister, 
                                         bool* isImmidiate,
@@ -135,9 +135,9 @@ enum compilationErrs insertLabel (char* line, struct label **labels,
                                   enum commands cmd, FILE* const asmHere, 
                                   size_t sizeOfLabels);
 
-enum compilationErrs detectLabel (char* line, size_t whichLine,
+enum compilationErrs detectLabel (char* line,
                                   struct label ***labels, size_t currLabel,
-                                  size_t *sizeOfLabels);
+                                  size_t *sizeOfLabels, size_t* ip);
 
 bool isLabel (char* line);
 bool callocTheInside (struct label** labels);

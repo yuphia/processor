@@ -42,7 +42,7 @@ enum errCodes translateCode (unsigned char* code,
                    break;
 
             case (PUSH | 0b01000000) | 0b00100000:
-                   fprintf (disasmHere, "push [%lg]", *(double*)(code + ip + 1));
+                   fprintf (disasmHere, "push [%lg]\n", *(double*)(code + ip + 1));
                    ip += 8;
                    break;
 
@@ -89,6 +89,33 @@ enum errCodes translateCode (unsigned char* code,
                    fprintf (disasmHere, "\n");
                    ip++;
                    break;              
+            
+            case (POP | 0b01000000) | 0b00100000:                   
+                   fprintf (disasmHere, "pop [%lg]\n", *(double*)(code + ip + 1));
+                   ip += 8;
+                   break;
+
+            case ((POP | 0b01000000) | 0b10000000) | 0b00100000:
+                   fprintf (disasmHere, "pop [");
+
+                   tempErr = translateRegister (*(code + ip + 1), disasmHere);
+                   if (tempErr != NO_ERROR)
+                       return tempErr;
+
+                   fprintf (disasmHere, "+%lg]\n", *(double*)(code + ip + 2));
+                   ip+=9;
+                   break;
+
+            case (POP | 0b01000000) | 0b10000000:
+                   fprintf (disasmHere, "pop [");
+
+                   tempErr = translateRegister (*(code + ip + 1), disasmHere);
+                   if (tempErr != NO_ERROR)
+                       return tempErr;
+
+                   fprintf (disasmHere, "]\n");
+                   ip++;
+                   break;
 
             case JMP:
                    fprintf (disasmHere, "jmp %d\n", *(code + ip + 1)); 
@@ -105,6 +132,28 @@ enum errCodes translateCode (unsigned char* code,
 
             case HALT:
                    fprintf (disasmHere, "hlt\n");
+                   break;
+
+            case PRNT:
+                   fprintf (disasmHere, "print\n");
+                   break;
+
+            case IN:
+                   fprintf (disasmHere, "in\n");
+                   break;
+
+            case CALL:
+                   fprintf (disasmHere, "call %d\n", *(code + ip + 1));
+                   ip++;
+                   break;
+
+            case RET:
+                   fprintf (disasmHere, "ret\n");
+                   break;                   
+
+            case JA:
+                   fprintf (disasmHere, "ja %d\n", *(code + ip + 1));
+                   ip++;
                    break;
 
             default:

@@ -78,6 +78,7 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
         LOGDUMP (logFileConst, stk, 0, "Left canary in buffer is dead, Most likely the stack"
                                        " buffer elements have been accessed from the outside", 1);
         fclose (logFileConst);
+ 
         return CANARYL_BUFF_STK_DEAD;
     }
 
@@ -86,6 +87,7 @@ enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
         LOGDUMP (logFileConst, stk, 0, "Right canary in buffer is dead, Most likely the stack"
                                        " buffer elements have been accessed from the outside", 1);
         fclose (logFileConst);
+ 
         return CANARYR_BUFF_STK_DEAD;
     }
 
@@ -154,11 +156,11 @@ hash_t hashCalc (struct stk<data>* stk)
     hash ^= rotl (stk->canaryL);
     hash ^= rotl (stk->lastError);
     hash ^= rotl (stk->capacity);
-    hash ^= rotl (stk->poison);
+    hash ^= rotl ((hash_t)stk->poison);
 
     if (stk->nElement > 0 && stk->buffer != nullptr)
         for (size_t i = 0; i < stk->nElement; ++i)
-            hash ^= rotl (stkBuffer (i));
+            hash ^= rotl ((hash_t)stkBuffer (i));
 
     hash ^= rotl (stk->canaryR);
 

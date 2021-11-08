@@ -16,6 +16,7 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
 
     static size_t currLabel = 0;
     static size_t sizeOfLabels = START_LABELS_SIZE;
+    static size_t ip = 0;
 
     bool tempErr = callocTheInside (labels);
     if (tempErr != 1)
@@ -43,9 +44,9 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
         enum compilationErrs compilationStatusIn = NO_ERROR;
 
         if (!isComment(((codeText->lines) + currLine)->line))
-            compilationStatusIn = parseLine ((codeText->lines) + currLine, asmHere,
-                                            currLine + 1, &labels, 0,
-                                            &currLabel, &sizeOfLabels);
+            compilationStatusIn = parseLine ((codeText->lines) + currLine,
+                                            asmHere, &labels, 0,
+                                            &currLabel, &sizeOfLabels, &ip);
 
         if (compilationStatusIn != NO_ERROR)
         {
@@ -68,8 +69,8 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
 
         if (!isComment(((codeText->lines) + currLine)->line))
             compilationStatusIn = parseLine ((codeText->lines) + currLine, asmHere,
-                                            currLine + 1, &labels, 1,
-                                            &currLabel, &sizeOfLabels);
+                                             &labels, 1,
+                                             &currLabel, &sizeOfLabels, &ip);
 
         if (compilationStatusIn != NO_ERROR)
         {
@@ -92,9 +93,9 @@ struct errorInfo *compileCodeMain (struct errorInfo* info, struct Text *codeText
 }
 
 enum compilationErrs parseLine (struct Line* line, FILE* const asmHere,
-                                size_t currLine, struct label ***labels,
+                                struct label ***labels,
                                 bool isWriteAllowed,
-                                size_t *currLabel, size_t *sizeOfLabels)
+                                size_t *currLabel, size_t *sizeOfLabels, size_t* ip)
 {
     MY_ASSERT (line != nullptr, "pointer to line equals nullptr\n");
 
@@ -104,41 +105,46 @@ enum compilationErrs parseLine (struct Line* line, FILE* const asmHere,
     sscanf (line->line, "%s", cmd);/*%lg*/
 
     enum compilationErrs compilationStatus = putToCode (cmd, line->line, &arg,
-                                                        asmHere, currLine,
+                                                        asmHere, 
                                                         labels, isWriteAllowed,
-                                                        currLabel, sizeOfLabels);
+                                                        currLabel, sizeOfLabels, ip);
 
     return compilationStatus;
 }
 
 enum compilationErrs putToCode (char* cmd, char* line, double* arg,
-                                FILE* const asmHere, size_t currLine,
+                                FILE* const asmHere, 
                                 struct label ***labels, bool isWriteAllowed,
-                                size_t *currLabel, size_t *sizeOfLabels)
+                                size_t *currLabel, size_t *sizeOfLabels, size_t* ip)
 {
     MY_ASSERT (line != nullptr, "Pointer to line array is nullptr\n");
     MY_ASSERT (line != nullptr, "Pointer to arg is equal to nullptr\n");
 
 
-
-    if (strcmp (cmd, "push") == 0 && isWriteAllowed)
+    (*ip)++;
+    if (strcmp (cmd, "push") == 0)
     {
-        enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere, 1, 1, 1, 0);
-        if (argErr != NO_ERROR)
-            return argErr;
-
-    }
-
-    else if (strcmp (cmd, "pop") == 0 && isWriteAllowed)
-    {
-        enum compilationErrs argErr = getArgument (line, arg, POP, asmHere, 0, 1, 0, 1);
+     
+        enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere, 
+                                                   1, 1, 1, 0, ip, isWriteAllowed);
         if (argErr != NO_ERROR)
             return argErr;
     }
 
-    else if (strcmp (cmd, "hlt") == 0 && isWriteAllowed)
+    else if (strcmp (cmd, "pop") == 0)
     {
-        WRITE (HALT);
+        enum compilationErrs argErr = getArgument (line, arg, POP, asmHere, 
+                                                   1, 1, 0, 1, ip, isWriteAllowed);
+        if (argErr != NO_ERROR)
+            return argErr;
+    }
+
+    else if (strcmp (cmd, "hlt") == 0)
+    {
+        if(isWriteAllowed)
+        {
+            WRITE (HALT);
+        }
 
         if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
@@ -146,10 +152,14 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
         return checkCmdForComment (line, 1);
     }
 
-    else if (strcmp (cmd, "add") == 0 && isWriteAllowed)
+    else if (strcmp (cmd, "add") == 0)
     {
-        WRITE (ADD);
-        if (*arg != poisonProc)
+        if(isWriteAllowed)
+        {
+            WRITE (ADD);
+        }
+
+            if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
 
         return checkCmdForComment (line, 1);
@@ -157,7 +167,10 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
 
     else if (strcmp (cmd, "mul") == 0 && isWriteAllowed)
     {
-        WRITE (MUL);
+        if(isWriteAllowed)
+        {
+            WRITE (MUL);
+        }
 
         if (*arg != poisonProc)
             return TOO_MANY_ARGUMENTS;
@@ -165,18 +178,81 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
         return checkCmdForComment (line, 1);
     }
 
-    else if (strcmp (cmd, "jmp") == 0 && isWriteAllowed)
+    else if (strcmp (cmd, "print") == 0 && isWriteAllowed)
     {
-        enum compilationErrs tempErr = insertLabel (line, *labels, JMP,
+        if(isWriteAllowed)
+        {
+            WRITE (PRNT);
+        }
+
+        if (*arg != poisonProc)
+            return TOO_MANY_ARGUMENTS;
+    }
+
+    else if (strcmp (cmd, "in") == 0 && isWriteAllowed)
+    {
+        if(isWriteAllowed)
+        {
+            WRITE (IN);
+        }
+
+        if (*arg != poisonProc)
+            return TOO_MANY_ARGUMENTS;
+    }
+
+    else if (strcmp (cmd, "jmp") == 0)
+    {
+        
+        enum compilationErrs tempErr = NO_ERROR; 
+        if(isWriteAllowed)            
+            tempErr = insertLabel (line, *labels, JMP,
                                                     asmHere, *sizeOfLabels);
+        (*ip)++;
+        printf ("ipjmp = %zu\n", (*ip));
 
         return tempErr;
+    }
+    
+    else if (strcmp (cmd, "call") == 0)
+    {
+        enum compilationErrs tempErr = NO_ERROR;
+        if(isWriteAllowed)    
+            tempErr = insertLabel (line, *labels, CALL,
+                                                    asmHere, *sizeOfLabels);
+    
+        (*ip)++;
+        return tempErr;
+    }
+
+    else if (strcmp (cmd, "ret") == 0)
+    {
+        if(isWriteAllowed)
+        {
+            WRITE (RET);
+        }
+
+        if (*arg != poisonProc)
+            return TOO_MANY_ARGUMENTS;
+    }
+
+    else if (strcmp (cmd, "ja") == 0)
+    {
+        enum compilationErrs tempErr = NO_ERROR;
+        if (isWriteAllowed)
+            tempErr = insertLabel (line, *labels, JA,
+                                                    asmHere, *sizeOfLabels);
+        
+        (*ip)++;
+        return tempErr;       
     }
 
     else if (!isWriteAllowed)
     {
-        enum compilationErrs tempErr = detectLabel (line, currLine, labels,
-                                                    *currLabel, sizeOfLabels);
+        enum compilationErrs tempErr = detectLabel (line, labels, *currLabel, 
+                                                    sizeOfLabels, ip);
+        printf ("line = %s\n"
+                "ip = %zu\n", line, *ip);
+    
         if (tempErr == NO_ERROR)
             (*currLabel)++;
 
@@ -327,8 +403,8 @@ char* skipCmd (char* str)
 
 enum compilationErrs getArgument (char* line, double* argument,
                                   enum commands cmd, FILE* const asmHere,
-                                  bool isMemAllowed, bool isRegAllowed, bool isImmAllowed,
-                                  bool isNoArgAllowed)
+                                  bool isMemAllowed, bool isRegAllowed, bool isImmAllowed, 
+                                  bool isNoArgAllowed, size_t* ip, bool isWriteAllowed)
 {
     MY_ASSERT (line != nullptr, "Pointer to line is equal to nullptr\n");
     MY_ASSERT (argument != nullptr, "Pointer to argument is equal to nullptr\n");
@@ -360,9 +436,10 @@ enum compilationErrs getArgument (char* line, double* argument,
     enum compilationErrs checkImmAndReg = isImmRegDetection (pointerToArg, &isRegister,
                                                              &isImmidiate, argument, &reg);
 
-    if (isRegister > isRegAllowed ||
-        isMemory > isMemAllowed   ||
-        isImmidiate > isImmAllowed)
+    if ((isRegister  > isRegAllowed || 
+           isMemory > isMemAllowed || 
+        isImmidiate > isImmAllowed) &&             
+        !(isMemAllowed && isMemory == 1 && (isRegister == 1 || isImmidiate == 1)))
         return FORBIDDEN_ARGUMENT;
 
     if (checkImmAndReg != NO_ERROR)
@@ -373,14 +450,19 @@ enum compilationErrs getArgument (char* line, double* argument,
 /*
     printf ("cmd = %d\n"
             "cmdAfter = %d\n", cmd, );*/
-    FILL_FIELD_AND_WRITE();
+    if(isWriteAllowed)
+    {
+        FILL_FIELD_AND_WRITE();
 
-    if (isRegister == 1)
-        WRITE_REGISTER();
+        if (isRegister == 1)
+            WRITE_REGISTER();
 
-    if (isImmidiate == 1)
-        if (fwrite (argument, sizeof(double), 1, asmHere) != 1)
-            return WRITING_ERROR;
+        if (isImmidiate == 1)
+            if (fwrite (argument, sizeof(double), 1, asmHere) != 1)
+                return WRITING_ERROR;
+    }
+
+    *ip += (size_t)(isRegister*1 + isImmidiate*8);
 
     return NO_ERROR;
 }
@@ -617,9 +699,9 @@ enum compilationErrs checkCmdForComment (char* line, bool isCmdInside)
     return NO_ERROR;
 }
 
-enum compilationErrs detectLabel (char* line, size_t whichLine,
+enum compilationErrs detectLabel (char* line, 
                                   struct label ***labels, size_t currLabel,
-                                  size_t *sizeOfLabels)
+                                  size_t *sizeOfLabels, size_t* ip)
 {
     MY_ASSERT (line != nullptr, "Pointer to line is nullptr");
     MY_ASSERT (labels != nullptr, "Pointer to labels is nullptr");
@@ -642,8 +724,13 @@ enum compilationErrs detectLabel (char* line, size_t whichLine,
         }
 
         (*(*labels + currLabel))->label = line;
-        (*(*labels + currLabel))->labelPointsTo = whichLine;
+        
+        (*ip)--;
+        
+        printf ("currLabel ip = %zu\n", *ip);
 
+        (*(*labels + currLabel))->labelPointsTo = *ip;         
+        
         return NO_ERROR;
     }
     else
@@ -682,6 +769,7 @@ enum compilationErrs insertLabel (char* line, struct label **labels,
         {
 
             WRITE (cmd);
+            printf ("char = %zu\n", ((*(labels + currLabel))->labelPointsTo));
             fwrite (&((*(labels + currLabel))->labelPointsTo), sizeof (char), 1, asmHere);
         }
     }

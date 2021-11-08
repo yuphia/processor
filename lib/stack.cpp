@@ -32,7 +32,7 @@ int main ()
    
     //printf ("ts nelement = %zu\n", testStack.nElement);
 
-    popStk<double> (&testStack, &poppedVal);
+    //popStk<double> (&testStack, &poppedVal);
     //printStk (&testStack);
     //printf ("popped value = %d\n", poppedVal);
 
@@ -51,6 +51,10 @@ int main ()
     popStk<double> (&testStack, &poppedVal);
     popStk<double> (&testStack, &poppedVal);
     popStk<double> (&testStack, &poppedVal);
+    popStk<double> (&testStack, &poppedVal);
+    popStk<double> (&testStack, &poppedVal);
+    //popStk<double> (&testStack, &poppedVal);
+
     //popStk<double> (&testStack, &poppedVal);
     //popStk<double> (&testStack, &poppedVal);
 

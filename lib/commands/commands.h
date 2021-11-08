@@ -9,5 +9,10 @@ enum commands
     POP  = 2,
     ADD  = 3,
     MUL  = 4,
-    JMP = 5
+    JMP  = 5,
+    PRNT = 6,
+    IN   = 7,
+    CALL = 8,
+    RET  = 9,
+    JA   = 10
     };

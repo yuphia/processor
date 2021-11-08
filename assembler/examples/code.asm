@@ -1,11 +1,22 @@
-add
-mul
-pop
-push 5
+in
+in
+
+ja metka:
+pop ax
+pop bx
+
 push ax
-push [ax]
-push [bx+5] ;sjfdklfjsdlk
-jmp metka: ;askjdshfhskdjfhsdjkfhjdskh
-hlt
+push bx
+print
+print
 
 metka:
+
+hlt
+
+
+print
+print
+ret
+
+

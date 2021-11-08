@@ -2,11 +2,11 @@
 
 int main (int argc, char *argv[])
 {
-    if (argc != 3)
+    if (argc != 2)
     {
         printf ("You forgot to put filenames in the setup command.\n"
                 "Please use the setup as follows.\n"
-                "%s input.bin output.asm\n", argv[0]);
+                "%s input.bin\n", argv[0]);
         return 1;
     }
 
@@ -21,13 +21,11 @@ int main (int argc, char *argv[])
     unsigned char* machineCode = getCode (asmFromHere, &sizeOfCode);
     fclose (asmFromHere);
 
-    FILE* const disasmHere = fopen (argv[2], "w");
-
     enum errCodes errCode = NO_ERROR;
 
+    errCode = runCode (machineCode, sizeOfCode);
+    
     printErr (errCode);
-
-    fclose (disasmHere);
 
     free (machineCode);
     return 0;
