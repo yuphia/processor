@@ -164,6 +164,23 @@ opAsmSquare:
 opDisSquare:
 	vim disassembler/examples/squareDis.asm
 
+openRec:
+	vim assembler/examples/rec.asm
+
+asmRec:
+	./$(OBJ_FILE_PATH_RELEASE_ASM) assembler/examples/rec.asm assembler/examples/rec.bin
+
+runRec:
+	./$(OBJ_FILE_PATH_RELEASE_PROC)  assembler/examples/rec.bin
+
+disasmRec:
+	./$(OBJ_FILE_PATH_RELEASE_DISASM) assembler/examples/rec.bin disassembler/examples/rec.asm
+
+opAsmRec:
+	ghex assembler/examples/rec.bin
+
+opDisRec:
+	vim disassembler/examples/rec.asm
 
 
 
