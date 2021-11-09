@@ -265,8 +265,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
     }
 
     else if (strcmp (cmd, "jae") == 0)
-    {
-        $
+    {        
         enum compilationErrs tempErr = NO_ERROR;
         if (isWriteAllowed)
             tempErr = insertLabel (line, *labels, JAE,
@@ -299,7 +298,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
     }
 
     else if (strcmp (cmd, "je") == 0)
-    {
+    {        
         enum compilationErrs tempErr = NO_ERROR;
         if (isWriteAllowed)
             tempErr = insertLabel (line, *labels, JE,
@@ -321,7 +320,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
     }
     
     else if (strcmp (cmd, "sub") == 0)
-    {
+    {        
         if(isWriteAllowed)
         {
             WRITE (SUB);
@@ -334,7 +333,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
     }
 
     else if (strcmp (cmd, "div") == 0)
-    {
+    {        
         if(isWriteAllowed)
         {
             WRITE (DIV);
@@ -344,14 +343,27 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             return TOO_MANY_ARGUMENTS;
 
         return checkCmdForComment (line, 1);
-    }   
+    }  
+
+    else if (strcmp (cmd, "sqrt") == 0)
+    {        
+        if(isWriteAllowed)
+        {
+            WRITE (SQRT);
+        }
+
+        if (*arg != poisonProc)
+            return TOO_MANY_ARGUMENTS;
+
+        return checkCmdForComment (line, 1);
+    } 
 
     else if (!isWriteAllowed)
     {
         enum compilationErrs tempErr = detectLabel (line, labels, *currLabel, 
                                                     sizeOfLabels, ip);
-        printf ("line = %s\n"
-                "ip = %zu\n", line, *ip);
+        /*printf ("line = %s\n"
+                "ip = %zu\n", line, *ip);*/
     
         if (tempErr == NO_ERROR)
             (*currLabel)++;

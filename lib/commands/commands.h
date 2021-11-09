@@ -21,5 +21,6 @@ enum commands
     JE   = 14, 
     DIV  = 15,
     SUB  = 16,
-    JNE  = 17
+    JNE  = 17,
+    SQRT = 18
     };

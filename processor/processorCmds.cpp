@@ -4,6 +4,9 @@
 
 #include "processorCmds.h"
 
+#undef $
+#define $
+
 unsigned char* getCode (FILE* const code, size_t* sizeOfCode)
 {
     MY_ASSERT (code != nullptr, "A mistake happened while opening code file\n");
@@ -44,11 +47,13 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
         switch (*(code + ip))
         {
             case PUSH | 0b00100000:
+                   $
                    pushStk<double> (&proc.stackProc, *(double*)(code + ip + 1));                
                    ip += 8;
                    break;
 
             case PUSH | 0b10000000:
+                   $
                    tempErr = pushStkFromRegister ((enum registersEnum)*(code + ip + 1), &proc);
 
                    if (tempErr != NO_ERROR)
@@ -62,11 +67,13 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case (PUSH | 0b01000000) | 0b00100000:
+                   $
                    pushStk<double> (&proc.stackProc, proc.operative[(int)*(double*)(code + ip + 1)]);
                    ip += 8;
                    break;
 
             case ((PUSH | 0b01000000) | 0b10000000) | 0b00100000:
+                   $
                    tempErr = pushStkFromRegister ((enum registersEnum)*(code + ip + 1), &proc);
                    pushStk<double> (&proc.stackProc, *(double*)(code + ip + 2));
                    if (tempErr != NO_ERROR)
@@ -86,6 +93,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case (PUSH | 0b01000000) | 0b10000000:
+                   $
                    tempErr = pushStkFromRegister ((enum registersEnum)*(code + ip + 1), &proc);
 
                    if (tempErr != NO_ERROR)
@@ -103,6 +111,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case (PUSH | 0b00100000) | 0b10000000:
+                   $
                    tempErr = pushStkFromRegister ((enum registersEnum)*(code + ip + 1), &proc);
 
                    if (tempErr != NO_ERROR)
@@ -122,20 +131,24 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case POP:
+                   $
                    popStk<double> (&proc.stackProc, &tempPop1);
                    break;
 
             case POP | 0b10000000:
+                   $
                    tempErr = popStkToRegister ((enum registersEnum)*(code + ip + 1), &proc); 
                    ip++;
                    break;
 
             case (POP | 0b01000000) | 0b00100000:
+                   $
                    popStk<double> (&proc.stackProc, &proc.operative[(int)*(double*)(code + ip + 1)]);
                    ip += 8;
                    break;
 
             case ((POP | 0b01000000) | 0b10000000) | 0b00100000:
+                   $
                    tempErr = pushStkFromRegister ((enum registersEnum)*(code + ip + 1), &proc);
                    pushStk<double> (&proc.stackProc, *(double*)(code + ip + 2));
                    if (tempErr != NO_ERROR)
@@ -154,6 +167,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case (POP | 0b01000000) | 0b10000000: 
+                   $
                    tempErr = pushStkFromRegister ((enum registersEnum)*(code + ip + 1), &proc);
 
                    if (tempErr != NO_ERROR)
@@ -170,11 +184,13 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case JMP:
+                   $
                    ip = *(code + ip + 1);
                    ip--;                   
                    break;
 
             case ADD:
+                   $
                    popStk<double> (&proc.stackProc, &tempPop1);
                    popStk<double> (&proc.stackProc, &tempPop2);
 
@@ -183,6 +199,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case DIV:
+                   $
                    popStk<double> (&proc.stackProc, &tempPop1);
                    popStk<double> (&proc.stackProc, &tempPop2);
 
@@ -191,6 +208,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case SUB:
+                   $
                    popStk<double> (&proc.stackProc, &tempPop1);
                    popStk<double> (&proc.stackProc, &tempPop2);
 
@@ -199,6 +217,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case MUL:
+                   $
                    popStk<double> (&proc.stackProc, &tempPop1);
                    popStk<double> (&proc.stackProc, &tempPop2);
 
@@ -207,6 +226,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case HALT:
+                   $
                    dtorStk<int> (&proc.stackCalls);
                    dtorStk<double> (&proc.stackProc);
                    
@@ -214,11 +234,13 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case PRNT:
+                   $
                    popStk<double> (&proc.stackProc, &tempPop1);
                    printf ("%lg\n", tempPop1);
                    break;
 
             case IN:
+                   $
                    scanf ("%lg", &tempForRead);
 
                    if (tempForRead == LOWEST_DOUBLE)                                          
@@ -231,17 +253,20 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;                  
 
             case CALL:
+                   $
                    pushStk<int> (&proc.stackCalls, ip+1);
                    ip = *(code + ip + 1);
                    ip--;                   
                    break;
 
             case RET:                    
+                   $
                    popStk<int> (&proc.stackCalls, &tempForRet);
                    ip = (size_t)tempForRet;
                    break;
 
             case JA: 
+                   $
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
@@ -256,6 +281,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case JAE:
+                   $
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
@@ -270,6 +296,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
                 
             case JB:
+                   $
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
@@ -284,6 +311,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case JBE:
+                   $
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
@@ -298,25 +326,11 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    break;
 
             case JE:
+                   $
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
-                   if (tempPop1 - tempPop2 < 1e-10 && tempPop2 - tempPop1 > -1e-10)
-                   {
-                       ip = *(code + ip + 1);
-                       ip--;
-                   }
-                   else
-                       ip++;
-
-                   break;
-
-            case JNE:
-                   popStk<double>(&proc.stackProc, &tempPop1);
-                   popStk<double>(&proc.stackProc, &tempPop2);
-
-                   printf ("jne = %d", tempPop1 - tempPop2 >= 1e-10 || tempPop2 - tempPop1 <= -1e-10);
-                   if (tempPop1 - tempPop2 >= 1e-10 || tempPop2 - tempPop1 <= -1e-10)
+                   if (abs (tempPop1 - tempPop2) < 1e-10)
                    {
                        $
                        ip = *(code + ip + 1);
@@ -326,6 +340,32 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                        ip++;
 
                    break;
+
+            case JNE:
+                   $
+                   popStk<double>(&proc.stackProc, &tempPop1);
+                   popStk<double>(&proc.stackProc, &tempPop2);
+
+                   if (abs (tempPop1 - tempPop2) >= 1e-10)
+                   {
+                       $
+                       ip = *(code + ip + 1);
+                       ip--;
+                   }
+                   else
+                       ip++;
+
+                   break;
+
+            case SQRT:
+                    $
+                    popStk<double> (&proc.stackProc, &tempPop1);
+
+                    if (tempPop1 < 0)
+                        return NEGATIVE_SQRT;
+
+                    pushStk<double> (&proc.stackProc, sqrt(tempPop1));    
+                    break;
 
             default:                  
                    printf ("command = %d\n", *(code+ip)); 
@@ -361,9 +401,14 @@ void printErr (enum errCodes err)
         case WRONG_RET:
             printf ("Ret w/o calls\n");
             break;
+        
+        case NEGATIVE_SQRT:
+            printf ("Trying to calculate square root of negative argument\n");
+            break;
 
         default:
             printf ("Error in errors lol\n");
+            break;
     }
 }
 
@@ -382,18 +427,22 @@ enum errCodes pushStkFromRegister (enum registersEnum reg, struct processor *pro
     switch (reg)
     {
         case ax:
+            //printf ("from ax pushed %lg\n", proc->regs.ax);
             pushStk<double> (&(proc->stackProc), proc->regs.ax);
             break;
 
         case bx:
+            //printf ("from bx pushed %lg\n", proc->regs.bx);
             pushStk<double> (&(proc->stackProc), proc->regs.bx);
             break;
 
         case cx:
+            //printf ("from cx pushed %lg\n", proc->regs.cx);
             pushStk<double> (&(proc->stackProc), proc->regs.cx);
             break;
 
         case dx:
+            //printf ("from dx pushed %lg\n", proc->regs.dx);
             pushStk<double> (&(proc->stackProc), proc->regs.dx);
             break;
 
@@ -411,22 +460,25 @@ enum errCodes popStkToRegister (enum registersEnum reg, struct processor *proc)
     {
         case ax:
             popStk<double> (&(proc->stackProc), &tempForPop);
-            proc->regs.ax = (enum registersEnum)tempForPop;             
+            //printf ("to ax popped = %lg\n", tempForPop);
+            proc->regs.ax = tempForPop;             
             break;
 
         case bx:
             popStk<double> (&(proc->stackProc), &tempForPop);
-            proc->regs.bx = (enum registersEnum)tempForPop;     
+            //printf ("to bx popped = %lg\n", tempForPop);
+            proc->regs.bx = tempForPop;     
             break;
 
         case cx:
             popStk<double> (&(proc->stackProc), &tempForPop);
-            proc->regs.cx = (enum registersEnum)tempForPop;
+            //printf ("to cx popped = %lg\n", tempForPop);
+            proc->regs.cx = tempForPop;
             break;
 
         case dx:
             popStk<double> (&(proc->stackProc), &tempForPop);
-            proc->regs.dx = (enum registersEnum)tempForPop;
+            proc->regs.dx = tempForPop;
             break;
 
         default:
@@ -435,5 +487,10 @@ enum errCodes popStkToRegister (enum registersEnum reg, struct processor *proc)
 
     return NO_ERROR;
 }
+
+/*double abs (double n)
+{
+    return (n > 0) ? n : -n;
+}*/
 
 #endif

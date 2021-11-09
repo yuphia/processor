@@ -189,6 +189,10 @@ enum errCodes translateCode (unsigned char* code,
                    fprintf (disasmHere, "sub\n");
                    break;
 
+            case SQRT:
+                   fprintf (disasmHere, "sqrt\n");
+                   break;
+
             default:
                    return UNRECOGNISED_COMMAND;
                    break;

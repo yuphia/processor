@@ -20,7 +20,8 @@ enum errCodes
     UNRECOGNISED_COMMAND = 1,
     UNKNOWN_REGISTER = 2,
     FALSE_READ = 3,
-    WRONG_RET = 4
+    WRONG_RET = 4,
+    NEGATIVE_SQRT = 5
     };
 
 struct registers
@@ -60,5 +61,7 @@ void fillOperativeNAN (double* operative);
 enum errCodes pushStkFromRegister (enum registersEnum reg, struct processor *proc);
 
 enum errCodes popStkToRegister (enum registersEnum reg, struct processor *proc);
+
+//double abs (double n);
 #endif
 
