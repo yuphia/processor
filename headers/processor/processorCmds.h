@@ -1,6 +1,6 @@
 #ifndef PROCESSOR_CMDS_H
 
-#define PROCESSOR_CMDS_H 1                 
+#define PROCESSOR_CMDS_H 1
 
 #include "sort/sort.h"
 #include "strlibMy/strlibMy.h"
@@ -8,6 +8,7 @@
 #include "commands/commands.h"
 #include "myAssert/myAssert.h"
 #include "ultimateGuard/ultimateGuard.h"
+#include "stackFunctions/stackFunctions.h"
 
 const size_t OPERATIVE_SIZE = 1600;
 
@@ -37,7 +38,7 @@ enum registersEnum
     ax = 1,
     bx = 2,
     cx = 3,
-    dx = 4   
+    dx = 4
     };
 
 struct processor
@@ -53,7 +54,7 @@ struct processor
 
 unsigned char* getCode (FILE* const code, size_t* sizeOfCode);
 enum errCodes runCode (unsigned char* code, size_t sizeOfCode);
-    
+
 void printErr (enum errCodes err);
 
 void fillOperativeNAN (double* operative);

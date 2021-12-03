@@ -99,6 +99,18 @@ foreach(LIB ${LIBLIST})
     target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)  
 endforeach()
 
+foreach(LIB ${LIBSPROC})
+    target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)  
+endforeach()
+
+foreach(LIB ${LIBSASM})
+    target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)  
+endforeach()
+
+foreach(LIB ${LIBSDISASM})
+    target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)  
+endforeach()
+
 add_subdirectory(tools)
 message (STATUS "Collected tools: ${TOOLS}")
 
@@ -106,9 +118,9 @@ foreach(TOOL ${TOOLS})
     if (DEBUG)
         target_link_options (${TOOL} PRIVATE "${FLAGS}")
         target_compile_options (${TOOL} PRIVATE "${FLAGS}")
-        target_compile_options (${TOOL} PRIVATE "-D DEBUG")
+        target_compile_definitions (${TOOL} PRIVATE "DEBUG")
     else()   
-        target_compile_options (${TOOL} PRIVATE "-D NDEBUG")
+        target_compile_definitions (${TOOL} PRIVATE "NDEBUG")
     endif() 
 
 #    target_compile_options(${TOOL} PRIVATE "-E")
@@ -118,13 +130,18 @@ foreach(TOOL ${TOOLS})
     message (STATUS "tool: ${TOOL}")
             
     
-    target_compile_options (${TOOL} PUBLIC "${WARNS}")    
+    target_compile_options (${TOOL} PRIVATE "${WARNS}")    
     target_compile_features(${TOOL} PRIVATE cxx_std_11)
     
-    get_property(dirs TARGET ${TOOL} PROPERTY INTERFACE_COMPILE_OPTIONS)
+    get_property(dirs TARGET ${TOOL} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
     foreach(dir ${dirs})
         message(STATUS "dir='${dir}'")
     endforeach()
     target_link_libraries(${TOOL} ${LIBLIST})
 
 endforeach()
+
+target_link_libraries (processorExec ${LIBSPROC})
+target_link_libraries (assemblerExec ${LIBSASM})
+target_link_libraries (disassemblerExec ${LIBSDISASM})
+

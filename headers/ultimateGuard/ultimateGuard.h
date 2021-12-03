@@ -13,7 +13,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "../stackFunctions/stackFunctions.h"
+#include "stackFunctions/stackFunctions.h"
 
 //===========================================================================
 template <typename data>
@@ -23,7 +23,7 @@ size_t dumpCounter();
 hash_t rotl (hash_t n);
 
 template <typename data>
-enum stkError validityStk (struct stk<data>* stk/*, struct dumpInfo* info*/);
+enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info);
 
 template <typename data>
 hash_t hashCalc (struct stk<data>* stk);
@@ -32,7 +32,7 @@ template <typename data>
 void dumpFunctionInt (struct stk<data>* stk, size_t i, FILE* const logFileConst);
 
 template <typename data>
-enum stkError validityStk (struct stk<data>* stk/*, struct dumpInfo* info*/)
+enum stkError validityStk (struct stk<data>* stk, struct dumpInfo* info)
 {
     FILE* const logFileConst = fopen ("logs/log.txt", "a");
 

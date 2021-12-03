@@ -4,6 +4,7 @@
 #include "myAssert/myAssert.h"
 #include <math.h>
 #include <stdio.h>
+#include "ultimateGuard/ultimateGuard.h"
 
 #define stkBuffer(i) *(data*)((unsigned char*)stk->buffer + i*sizeof(data) + sizeof (canary_t))
 #define stkCanaryBufferL *(canary_t*)(stk->buffer)
@@ -172,25 +173,25 @@ struct dumpInfo
 };
 
 template <typename data>
-    struct stk
-        {
-            canary_t canaryL;
+struct stk
+    {
+        canary_t canaryL;
 
-            void* buffer; //buffer[capacity]
+        void* buffer; //buffer[capacity]
 
-            size_t nElement;
-            size_t capacity;
+        size_t nElement;
+        size_t capacity;
 
-            data poison;
+        data poison;
 
-            enum stkError lastError;
+        enum stkError lastError;
 
-            hash_t hash;
+        hash_t hash;
 
-            void (*dumper) (struct stk* stk, size_t i, FILE* const logFileConst);
+        void (*dumper) (struct stk* stk, size_t i, FILE* const logFileConst);
 
-            canary_t canaryR;
-        };
+        canary_t canaryR;
+    };
 
 
 //===========================================================================
