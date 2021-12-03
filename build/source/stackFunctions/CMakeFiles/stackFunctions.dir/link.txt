@@ -1,2 +1,0 @@
-/usr/bin/ar qc libstackFunctions.a  CMakeFiles/stackFunctions.dir/stackFunctions.cpp.o
-/usr/bin/ranlib libstackFunctions.a

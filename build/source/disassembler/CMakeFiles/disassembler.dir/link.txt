@@ -1,2 +1,0 @@
-/usr/bin/ar qc libdisassembler.a  CMakeFiles/disassembler.dir/disassemblerCmds.cpp.o
-/usr/bin/ranlib libdisassembler.a

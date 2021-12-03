@@ -1,2 +1,0 @@
-/usr/bin/ar qc libultimateGuard.a  CMakeFiles/ultimateGuard.dir/ultimateGuard.cpp.o
-/usr/bin/ranlib libultimateGuard.a
