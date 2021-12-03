@@ -103,7 +103,7 @@ add_subdirectory(tools)
 message (STATUS "Collected tools: ${TOOLS}")
 
 foreach(TOOL ${TOOLS})
-    #target_include_directories (${TOOL} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
+    target_include_directories (${TOOL} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
 
     if (DEBUG)
         target_link_options (${TOOL} PRIVATE "${FLAGS}")
