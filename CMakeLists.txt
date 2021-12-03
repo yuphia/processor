@@ -103,18 +103,28 @@ add_subdirectory(tools)
 message (STATUS "Collected tools: ${TOOLS}")
 
 foreach(TOOL ${TOOLS})
-    target_include_directories (${TOOL} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
-
     if (DEBUG)
         target_link_options (${TOOL} PRIVATE "${FLAGS}")
         target_compile_options (${TOOL} PRIVATE "${FLAGS}")
         target_compile_options (${TOOL} PRIVATE "-D DEBUG")
-    else()
+    else()   
         target_compile_options (${TOOL} PRIVATE "-D NDEBUG")
     endif() 
 
-    target_compile_options (${TOOL} PRIVATE "${WARNS}")    
+#    target_compile_options(${TOOL} PRIVATE "-E")
+    
+    target_include_directories (${TOOL} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
+    
+    message (STATUS "tool: ${TOOL}")
+            
+    
+    target_compile_options (${TOOL} PUBLIC "${WARNS}")    
     target_compile_features(${TOOL} PRIVATE cxx_std_11)
     
+    get_property(dirs TARGET ${TOOL} PROPERTY INTERFACE_COMPILE_OPTIONS)
+    foreach(dir ${dirs})
+        message(STATUS "dir='${dir}'")
+    endforeach()
     target_link_libraries(${TOOL} ${LIBLIST})
+
 endforeach()

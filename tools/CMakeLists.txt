@@ -1,8 +1,8 @@
 set(
     TOOLS
-    assembler
-    disassembler
-    processor
+    assemblerExec
+    disassemblerExec
+    processorExec
 )
 
 foreach(TOOL ${TOOLS})
