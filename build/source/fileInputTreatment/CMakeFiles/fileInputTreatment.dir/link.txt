@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfileInputTreatment.a  CMakeFiles/fileInputTreatment.dir/fileInputTreatment.cpp.o
+/usr/bin/ranlib libfileInputTreatment.a

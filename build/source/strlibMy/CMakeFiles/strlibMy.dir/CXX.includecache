@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../headers/myAssert/myAssert.h
+stdio.h
+-
+math.h
+-
+
+../headers/strlibMy/strlibMy.h
+stdio.h
+-
+errno.h
+-
+myAssert/myAssert.h
+../headers/strlibMy/myAssert/myAssert.h
+
+/home/lev/Documents/processorChertov/source/strlibMy/strlibMy.cpp
+strlibMy/strlibMy.h
+/home/lev/Documents/processorChertov/source/strlibMy/strlibMy/strlibMy.h
+

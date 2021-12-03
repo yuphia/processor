@@ -1,0 +1,2 @@
+/usr/bin/ar qc libstrlibMy.a  CMakeFiles/strlibMy.dir/strlibMy.cpp.o
+/usr/bin/ranlib libstrlibMy.a

@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../headers/fileInputTreatment/fileInputTreatment.h
+myAssert/myAssert.h
+../headers/fileInputTreatment/myAssert/myAssert.h
+stdio.h
+-
+cstring
+-
+iostream
+-
+
+../headers/myAssert/myAssert.h
+stdio.h
+-
+math.h
+-
+
+/home/lev/Documents/processorChertov/source/fileInputTreatment/fileInputTreatment.cpp
+fileInputTreatment/fileInputTreatment.h
+/home/lev/Documents/processorChertov/source/fileInputTreatment/fileInputTreatment/fileInputTreatment.h
+

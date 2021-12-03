@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../headers/myAssert/myAssert.h
+stdio.h
+-
+math.h
+-
+
+../headers/stackFunctions/stackFunctions.h
+myAssert/myAssert.h
+../headers/stackFunctions/myAssert/myAssert.h
+math.h
+-
+stdio.h
+-
+
+/home/lev/Documents/processorChertov/source/stackFunctions/stackFunctions.cpp
+stackFunctions/stackFunctions.h
+/home/lev/Documents/processorChertov/source/stackFunctions/stackFunctions/stackFunctions.h
+

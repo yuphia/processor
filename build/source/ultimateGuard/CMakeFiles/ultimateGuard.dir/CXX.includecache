@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../headers/myAssert/myAssert.h
+stdio.h
+-
+math.h
+-
+
+../headers/stackFunctions/stackFunctions.h
+myAssert/myAssert.h
+../headers/stackFunctions/myAssert/myAssert.h
+math.h
+-
+stdio.h
+-
+
+../headers/ultimateGuard/ultimateGuard.h
+stdio.h
+-
+math.h
+-
+../stackFunctions/stackFunctions.h
+../headers/stackFunctions/stackFunctions.h
+
+/home/lev/Documents/processorChertov/source/ultimateGuard/ultimateGuard.cpp
+ultimateGuard/ultimateGuard.h
+/home/lev/Documents/processorChertov/source/ultimateGuard/ultimateGuard/ultimateGuard.h
+

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libassembler.a  CMakeFiles/assembler.dir/assemblerCmds.cpp.o
+/usr/bin/ranlib libassembler.a
