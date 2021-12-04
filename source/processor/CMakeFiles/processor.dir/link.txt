@@ -1,2 +1,0 @@
-/usr/bin/ar qc libprocessor.a  CMakeFiles/processor.dir/processorCmds.o
-/usr/bin/ranlib libprocessor.a
