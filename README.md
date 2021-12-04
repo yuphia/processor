@@ -13,5 +13,13 @@
     3) run cmake "path to processor root dir"
     4) run make
 
+# Short description of the language
 
+    register names - {ax, bx, cx, dx}
 
+    1) push 'argument'
+        where 'argument':
+            
+            '''number''' - pushes a number onto stack
+            register name - pushes a number onto stack which is stored in the registers
+            register name + 
