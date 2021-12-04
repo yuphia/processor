@@ -93,14 +93,26 @@ FLAGS
 )
 
 add_subdirectory(source)
-message (STATUS "Collected libs: ${LIBLIST}")
+message (STATUS "Collected libs: ${LIBLIST} ${LIBSASM} ${LIBSPROC} ${LIBSDISASM}")
 
 foreach(LIB ${LIBLIST})
-    target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)  
+    target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers) 
+
+    get_property(dirs TARGET ${LIB} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+    foreach(dir ${dirs})
+        message(STATUS "${LIB} includes = '${dir}'")
+    endforeach()
+
 endforeach()
 
 foreach(LIB ${LIBSPROC})
-    target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)  
+    target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers) 
+
+    get_property(dirs TARGET ${LIB} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+    foreach(dir ${dirs})
+        message(STATUS "${LIB} includes ='${dir}'")
+    endforeach()
+    
 endforeach()
 
 foreach(LIB ${LIBSASM})
@@ -144,4 +156,3 @@ endforeach()
 target_link_libraries (processorExec ${LIBSPROC})
 target_link_libraries (assemblerExec ${LIBSASM})
 target_link_libraries (disassemblerExec ${LIBSDISASM})
-

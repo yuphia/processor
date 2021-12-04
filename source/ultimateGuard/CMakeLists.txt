@@ -1,1 +1,1 @@
-add_library (ultimateGuard STATIC ultimateGuard)
+add_library (ultimateGuard STATIC ultimateGuard.cpp)

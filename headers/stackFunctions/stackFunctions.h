@@ -4,7 +4,7 @@
 #include "myAssert/myAssert.h"
 #include <math.h>
 #include <stdio.h>
-#include "ultimateGuard/ultimateGuard.h"
+///#include "ultimateGuard/ultimateGuard.h"
 
 #define stkBuffer(i) *(data*)((unsigned char*)stk->buffer + i*sizeof(data) + sizeof (canary_t))
 #define stkCanaryBufferL *(canary_t*)(stk->buffer)

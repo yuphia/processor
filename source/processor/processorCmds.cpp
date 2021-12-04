@@ -27,10 +27,10 @@ unsigned char* getCode (FILE* const code, size_t* sizeOfCode)
 enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
 {
     struct stk<double> stkForProc = {};    
-    ctorStk (&stkForProc, (double)LOWEST_DOUBLE, &dumpFunctionDouble);
+    ctorStk<double> (&stkForProc, (double)LOWEST_DOUBLE, &dumpFunctionDouble);
 
     struct stk<int> stkForCalls = {};
-    ctorStk (&stkForCalls, (int)LOWEST_INT, &dumpFunctionInt);
+    ctorStk<int> (&stkForCalls, (int)LOWEST_INT, &dumpFunctionInt);
 
     struct processor proc = {{NAN, NAN, NAN, NAN}, stkForProc, stkForCalls, {}};
     fillOperativeNAN (proc.operative);

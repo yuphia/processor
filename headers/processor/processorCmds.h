@@ -7,8 +7,8 @@
 #include "fileInputTreatment/fileInputTreatment.h"
 #include "commands/commands.h"
 #include "myAssert/myAssert.h"
-#include "ultimateGuard/ultimateGuard.h"
 #include "stackFunctions/stackFunctions.h"
+#include "ultimateGuard/ultimateGuard.h"
 
 const size_t OPERATIVE_SIZE = 1600;
 
