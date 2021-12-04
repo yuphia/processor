@@ -70,6 +70,6 @@
 
     18) halt - shows where to stop executing the program
 
-    19) in - reads a value from the stack
+    19) in - reads a value from the input
             
                 
