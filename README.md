@@ -1,4 +1,4 @@
-###processor - a program emulating the work of a real life processor
+### processor - a program emulating the work of a real life processor
 
 # Table of contents:
 
@@ -6,7 +6,7 @@
     2) Disassembler - a program that translates binary into assembler (used to check if assembler works correctly)
     3) Processor - a program that runs binary code
 
-#Setup:
+# Setup:
 
     1) Create your build directory 
     2) cd into this directory
