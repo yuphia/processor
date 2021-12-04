@@ -97,7 +97,7 @@ message (STATUS "Collected libs: ${LIBLIST} ${LIBSASM} ${LIBSPROC} ${LIBSDISASM}
 
 foreach(LIB ${LIBLIST})
     target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers) 
-
+ 
     get_property(dirs TARGET ${LIB} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
     foreach(dir ${dirs})
         message(STATUS "${LIB} includes = '${dir}'")
@@ -107,8 +107,17 @@ endforeach()
 
 foreach(LIB ${LIBSPROC})
     target_include_directories (${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers) 
+    
+    target_link_libraries (${LIB} ${LIBLIST})
+    if (DEBUG)
+        target_link_options (${TOOL} PRIVATE "${FLAGS}")
+        target_compile_options (${TOOL} PRIVATE "${FLAGS}")
+        target_compile_definitions (${TOOL} PRIVATE "DEBUG")
+    else()   
+        target_compile_definitions (${LIB} PRIVATE "NDEBUG" PRIVATE "NDEBUG_STK")
+    endif() 
 
-    get_property(dirs TARGET ${LIB} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+    get_property(dirs TARGET ${LIB} PROPERTY INTERFACE_COMPILE_DEFINITIONS)
     foreach(dir ${dirs})
         message(STATUS "${LIB} includes ='${dir}'")
     endforeach()
@@ -132,11 +141,13 @@ foreach(TOOL ${TOOLS})
         target_compile_options (${TOOL} PRIVATE "${FLAGS}")
         target_compile_definitions (${TOOL} PRIVATE "DEBUG")
     else()   
-        target_compile_definitions (${TOOL} PRIVATE "NDEBUG")
+        target_compile_definitions (${TOOL} PRIVATE "NDEBUG" PRIVATE "NDEBUG_STK")
     endif() 
-
-#    target_compile_options(${TOOL} PRIVATE "-E")
     
+#    target_compile_options(${TOOL} PRIVATE "-E")
+
+    #target_compile_definitions (${TOOL})
+
     target_include_directories (${TOOL} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/headers)
     
     message (STATUS "tool: ${TOOL}")
