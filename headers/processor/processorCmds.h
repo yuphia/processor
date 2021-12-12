@@ -12,8 +12,6 @@
 
 const size_t OPERATIVE_SIZE = 1600;
 
-const double LOWEST_DOUBLE = -2147483648;
-const int LOWEST_INT = -2147483646;
 
 enum errCodes
     {
