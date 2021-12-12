@@ -4,7 +4,6 @@
 
 #include "processor/processorCmds.h"
 
-#undef $
 #define $
 
 unsigned char* getCode (FILE* const code, size_t* sizeOfCode)
