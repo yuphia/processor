@@ -125,24 +125,19 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
     (*ip)++;
     if (strcmp (cmd, "push") == 0)
     {
-        if(isWriteAllowed)
-        {
-            enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere, 
+     
+        enum compilationErrs argErr = getArgument (line, arg, PUSH, asmHere, 
                                                    1, 1, 1, 0, ip, isWriteAllowed);
-            if (argErr != NO_ERROR)
-                return argErr;
-        }
+        if (argErr != NO_ERROR)
+            return argErr;
     }
 
     else if (strcmp (cmd, "pop") == 0)
     {
-        if (isWriteAllowed)
-        {
-            enum compilationErrs argErr = getArgument (line, arg, POP, asmHere, 
+        enum compilationErrs argErr = getArgument (line, arg, POP, asmHere, 
                                                    1, 1, 0, 1, ip, isWriteAllowed);
-            if (argErr != NO_ERROR)
-                return argErr;
-        }
+        if (argErr != NO_ERROR)
+            return argErr;
     }
 
     else if (strcmp (cmd, "hlt") == 0)
@@ -545,9 +540,7 @@ enum compilationErrs getArgument (char* line, double* argument,
         return NO_ERROR;
     }
 
-//    printf ("%s\n", pointerToArg);
     enum compilationErrs checkMem = isMemoryCommand (&pointerToArg, &isMemory);
-//    printf ("%d\n", isMemory);
 
     if (checkMem != NO_ERROR)
         return checkMem;
@@ -571,7 +564,6 @@ enum compilationErrs getArgument (char* line, double* argument,
             "cmdAfter = %d\n", cmd, );*/
     if(isWriteAllowed)
     {
-//        printf ("reg %d imm %d mem %d\n", isRegister, isImmidiate, isMemory);
         FILL_FIELD_AND_WRITE();
 
         if (isRegister == 1)
