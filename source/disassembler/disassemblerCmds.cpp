@@ -118,8 +118,8 @@ enum errCodes translateCode (unsigned char* code,
                    break;
 
             case JMP:
-                   fprintf (disasmHere, "jmp %d\n", *(code + ip + 1)); 
-                   ip++;
+                   fprintf (disasmHere, "jmp %d\n", *(int*)(code + ip + 1)); 
+                   ip += sizeof(int);
                    break;
 
             case ADD:
@@ -143,8 +143,8 @@ enum errCodes translateCode (unsigned char* code,
                    break;
 
             case CALL:
-                   fprintf (disasmHere, "call %d\n", *(code + ip + 1));
-                   ip++;
+                   fprintf (disasmHere, "call %d\n", *(int*)(code + ip + 1));
+                   ip += sizeof(int);
                    break;
 
             case RET:
@@ -152,33 +152,33 @@ enum errCodes translateCode (unsigned char* code,
                    break;                   
 
             case JA:
-                   fprintf (disasmHere, "ja %d\n", *(code + ip + 1));
-                   ip++;
+                   fprintf (disasmHere, "ja %d\n", *(int*)(code + ip + 1));
+                   ip += sizeof(int);
                    break;
 
             case JAE:
-                   fprintf (disasmHere, "jae %d\n", *(code + ip + 1));
-                   ip++;
+                   fprintf (disasmHere, "jae %d\n", *(int*)(code + ip + 1));
+                   ip += sizeof(int);
                    break;
 
             case JB:
-                   fprintf (disasmHere, "jb %d\n", *(code + ip + 1));
-                   ip++;
+                   fprintf (disasmHere, "jb %d\n", *(int*)(code + ip + 1));
+                   ip += sizeof(int);
                    break;
 
             case JBE:
-                   fprintf (disasmHere, "jbe %d\n", *(code + ip + 1));
-                   ip++;
+                   fprintf (disasmHere, "jbe %d\n", *(int*)(code + ip + 1));
+                   ip += sizeof(int);
                    break;
 
             case JE:
-                   fprintf (disasmHere, "je %d\n", *(code + ip + 1));
-                   ip++;
+                   fprintf (disasmHere, "je %d\n", *(int*)(code + ip + 1));
+                   ip += sizeof(int);
                    break;
 
             case JNE:
-                   fprintf (disasmHere, "jne %d\n", *(code + ip + 1));
-                   ip++;
+                   fprintf (disasmHere, "jne %d\n", *(int*)(code + ip + 1));
+                   ip += sizeof(int);
                    break;
 
             case DIV:

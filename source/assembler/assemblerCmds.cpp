@@ -849,8 +849,10 @@ enum compilationErrs detectLabel (char* line,
         
         printf ("currLabel ip = %zu\n", *ip);
 
-        (*(*labels + currLabel))->labelPointsTo = *ip;         
-        
+        (*(*labels + currLabel))->labelPointsTo = *ip;
+        *ip += 4;         
+         printf ("currLabel ip = %zu\n", *ip);
+       
         return NO_ERROR;
     }
     else
@@ -872,6 +874,18 @@ enum compilationErrs insertLabel (char* line, struct label **labels,
     if (line == nullptr)
         return NO_LABEL_IN_JUMP;
 
+    int lineForJump = -1;
+
+    sscanf (line, "%d", &lineForJump);
+    printf ("%d\n", lineForJump);
+    if (lineForJump > 0)
+    {
+        WRITE (cmd);
+        fwrite (&lineForJump, sizeof (int), 1, asmHere);
+
+        return NO_ERROR;
+    }
+
     enum compilationErrs tempErr = checkCmdForComment (line, 0);
     line = jumpToLastSpace (line);
 
@@ -889,9 +903,10 @@ enum compilationErrs insertLabel (char* line, struct label **labels,
         {
 
             WRITE (cmd);
-            printf ("char = %zu\n", ((*(labels + currLabel))->labelPointsTo));
-            fwrite (&((*(labels + currLabel))->labelPointsTo), sizeof (char), 1, asmHere);
+            printf ("char = %d\n", ((*(labels + currLabel))->labelPointsTo));
+            fwrite (&((*(labels + currLabel))->labelPointsTo), sizeof (int), 1, asmHere);
         }
+
     }
 
     return NO_ERROR;
@@ -970,4 +985,9 @@ void freeAllLabels (struct label** labels, size_t sizeOfLabels)
 {
     for (size_t i = 0; i < sizeOfLabels; i++)
         free (*(labels + i));
+}
+
+void increaseLabelsByInt()
+{
+
 }

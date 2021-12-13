@@ -173,8 +173,9 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    ip++;
                    break;
 
-            case JMP:                   
-                   ip = *(code + ip + 1);
+            case JMP:                  
+                   printf ("jmpip = %d\n", *(int*)(code + ip + 1)); 
+                   ip = *(int*)(code + ip + 1);
                    ip--;                   
                    break;
 
@@ -236,7 +237,8 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
 
             case CALL:                   
                    pushStk<int> (&proc.stackCalls, (int)ip+1);
-                   ip = *(code + ip + 1);
+                   printf ("LINE = %d", *(int*)(code + ip + 1));
+                   ip = *(int*)(code + ip + 1);
                    ip--;                   
                    break;
 

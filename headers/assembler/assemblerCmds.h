@@ -77,7 +77,7 @@ struct cmdField
 struct label
         {
         char* label;
-        size_t labelPointsTo;        
+        int labelPointsTo;        
         };
 
 void getCode (FILE* const code, struct Text *codeText);
