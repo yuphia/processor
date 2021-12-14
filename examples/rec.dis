@@ -1,0 +1,28 @@
+in
+pop ax
+push 0
+pop bx
+push 1
+pop cx
+push 1
+pop dx
+call 42
+hlt
+push cx
+push dx
+mul
+pop dx
+push cx
+push 1
+add
+pop cx
+push bx
+push 1
+add
+pop bx
+push ax
+push bx
+jb 42
+push dx
+print
+ret

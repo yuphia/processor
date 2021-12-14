@@ -1,0 +1,78 @@
+in
+pop ax
+in
+pop bx
+in
+pop cx
+call 68
+call 41
+pop dx
+push 0
+push dx
+jae 181
+hlt
+push 4
+push ax
+mul
+push cx
+mul
+push bx
+push bx
+mul
+sub
+pop dx
+push dx
+ret
+push ax
+push 0
+jne 14
+push bx
+push 0
+je 125
+push bx
+push cx
+print
+push cx
+push -1
+mul
+div
+print
+jmp 39
+push cx
+push 0
+je 149
+jmp 38
+ret
+push 1
+push 2
+push 3
+print
+print
+print
+hlt
+push dx
+sqrt
+pop dx
+push ax
+push 2
+mul
+push dx
+push -1
+mul
+push bx
+push -1
+mul
+add
+div
+print
+push ax
+push 2
+mul
+push dx
+push bx
+push -1
+mul
+add
+div
+print
+hlt
