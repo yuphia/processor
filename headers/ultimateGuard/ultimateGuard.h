@@ -15,6 +15,7 @@
 #include <math.h>
 #include "stackFunctions/stackFunctions.h"
 
+
 //===========================================================================
 template <typename data>
 void dumpStk (struct stk<data>* stk, FILE* const logFileConst);
