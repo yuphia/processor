@@ -212,8 +212,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
         if(isWriteAllowed)            
             tempErr = insertLabel (line, *labels, JMP,
                                                     asmHere, *sizeOfLabels);
-        (*ip)++;
-        printf ("ipjmp = %zu\n", (*ip));
+        (*ip) += 4;
 
         return tempErr;
     }
@@ -225,7 +224,8 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             tempErr = insertLabel (line, *labels, CALL,
                                                     asmHere, *sizeOfLabels);
     
-        (*ip)++;
+        (*ip)+=4;
+        
         return tempErr;
     }
 
@@ -249,18 +249,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             tempErr = insertLabel (line, *labels, JA,
                                                     asmHere, *sizeOfLabels);
         
-        (*ip)++;
-        return tempErr;       
-    }
-
-    else if (strcmp (cmd, "ja") == 0)
-    {
-        enum compilationErrs tempErr = NO_ERROR;
-        if (isWriteAllowed)
-            tempErr = insertLabel (line, *labels, JA,
-                                                    asmHere, *sizeOfLabels);
-        
-        (*ip)++;
+        (*ip)+=4;
         return tempErr;       
     }
 
@@ -271,7 +260,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             tempErr = insertLabel (line, *labels, JAE,
                                                     asmHere, *sizeOfLabels);
         
-        (*ip)++;
+        (*ip)+=4;
         return tempErr;       
     }
 
@@ -282,7 +271,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             tempErr = insertLabel (line, *labels, JB,
                                                     asmHere, *sizeOfLabels);
         
-        (*ip)++;
+        (*ip)+=4;
         return tempErr;       
     }
 
@@ -293,7 +282,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             tempErr = insertLabel (line, *labels, JBE,
                                                     asmHere, *sizeOfLabels);
         
-        (*ip)++;
+        (*ip)+=4;
         return tempErr;       
     }
 
@@ -304,7 +293,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             tempErr = insertLabel (line, *labels, JE,
                                                     asmHere, *sizeOfLabels);
         
-        (*ip)++;
+        (*ip)+=4;
         return tempErr;       
     }  
 
@@ -315,7 +304,7 @@ enum compilationErrs putToCode (char* cmd, char* line, double* arg,
             tempErr = insertLabel (line, *labels, JNE,
                                                     asmHere, *sizeOfLabels);
         
-        (*ip)++;
+        (*ip)+=4;
         return tempErr;       
     }
     
@@ -507,7 +496,7 @@ char* skipCmd (char* str)
     for (; currentSymbol < strlen (str) && *(str + currentSymbol) != ' ';
                                                              currentSymbol++);
 
-    if (currentSymbol >= strlen (str) - 1)
+    if (currentSymbol >= strlen (str)) //!!!!
         return nullptr;
 
     return str + currentSymbol;
@@ -523,6 +512,7 @@ enum compilationErrs getArgument (char* line, double* argument,
     MY_ASSERT (asmHere != nullptr, "An error occurred while opening asmHere file\n");
 
     char* pointerToArg = skipCmd (line);
+    char* savePointerToArg = pointerToArg;
     //printf ("pointer to argument = %p", (void*) pointerToArg);
     bool isMemory    = false;
     bool isRegister  = false;
@@ -574,6 +564,9 @@ enum compilationErrs getArgument (char* line, double* argument,
                 return WRITING_ERROR;
     }
 
+    if (isMemory)
+        restoreBrackets (&savePointerToArg);
+
     *ip += (size_t)(isRegister*1 + isImmidiate*8);
 
     return NO_ERROR;
@@ -607,6 +600,7 @@ enum compilationErrs isMemoryCommand (char** line, bool* isMemory)
             *(*line + placeOfCurrEl) = ' ';
             }
         }
+
 
         *line = jumpToLastSpace (*line);
 
@@ -839,12 +833,8 @@ enum compilationErrs detectLabel (char* line,
         
         (*ip)--;
         
-        printf ("currLabel ip = %zu\n", *ip);
-
         (*(*labels + currLabel))->labelPointsTo = *ip;
-        *ip += 4;         
-         printf ("currLabel ip = %zu\n", *ip);
-       
+               
         return NO_ERROR;
     }
     else
@@ -869,7 +859,7 @@ enum compilationErrs insertLabel (char* line, struct label **labels,
     int lineForJump = -1;
 
     sscanf (line, "%d", &lineForJump);
-    printf ("%d\n", lineForJump);
+
     if (lineForJump > 0)
     {
         WRITE (cmd);
@@ -895,7 +885,6 @@ enum compilationErrs insertLabel (char* line, struct label **labels,
         {
 
             WRITE (cmd);
-            printf ("char = %d\n", ((*(labels + currLabel))->labelPointsTo));
             fwrite (&((*(labels + currLabel))->labelPointsTo), sizeof (int), 1, asmHere);
         }
 
@@ -979,7 +968,16 @@ void freeAllLabels (struct label** labels, size_t sizeOfLabels)
         free (*(labels + i));
 }
 
-void increaseLabelsByInt()
+/*void increaseLabelsByInt()
 {
 
+}*/
+
+void restoreBrackets (char **line)
+{
+    char* pointerToArg = *line + countSpacesInFront (*line) - 1;
+    
+    *pointerToArg = '[';
+    pointerToArg = skipCmd (pointerToArg);
+    *pointerToArg = ']';
 }

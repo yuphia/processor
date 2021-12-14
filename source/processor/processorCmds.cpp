@@ -173,8 +173,7 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    ip++;
                    break;
 
-            case JMP:                  
-                   printf ("jmpip = %d\n", *(int*)(code + ip + 1)); 
+            case JMP:                                                        
                    ip = *(int*)(code + ip + 1);
                    ip--;                   
                    break;
@@ -211,14 +210,14 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                                     tempPop1 * tempPop2);
                    break;
 
-            case HALT:                   
+            case HALT:                                      
                    dtorStk<int> (&proc.stackCalls);
                    dtorStk<double> (&proc.stackProc);
                    
                    return NO_ERROR;
                    break;
 
-            case PRNT:                   
+            case PRNT:                                      
                    popStk<double> (&proc.stackProc, &tempPop1);
                    printf ("%lg\n", tempPop1);
                    break;
@@ -235,9 +234,9 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
                    pushStk<double> (&proc.stackProc, tempForRead);
                    break;                  
 
-            case CALL:                   
-                   pushStk<int> (&proc.stackCalls, (int)ip+1);
-                   printf ("LINE = %d", *(int*)(code + ip + 1));
+            case CALL:                                      
+                   pushStk<int> (&proc.stackCalls, (int)ip+4);
+
                    ip = *(int*)(code + ip + 1);
                    ip--;                   
                    break;
@@ -253,81 +252,81 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
 
                    if (tempPop1 > tempPop2)
                    {
-                       ip = *(code + ip + 1);
+                       ip = *(int*)(code + ip + 1);
                        ip--;
                    }
                    else
-                       ip++;
+                       ip+=4;
 
                    break;
 
-            case JAE:                   
+            case JAE:                                      
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
                    if (tempPop1 >= tempPop2)
                    {
-                       ip = *(code + ip + 1);
+                       ip = *(int*)(code + ip + 1);
                        ip--;
                    }
                    else
-                       ip++;
+                       ip+=4;
 
                    break;
                 
-            case JB:                   
+            case JB:                                      
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
                    if (tempPop1 < tempPop2)
                    {
-                       ip = *(code + ip + 1);
+                       ip = *(int*)(code + ip + 1);
                        ip--;
                    }
                    else
-                       ip++;
+                       ip+=4;
 
                    break;
 
-            case JBE:                   
+            case JBE:                                      
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
                    if (tempPop1 <= tempPop2)
                    {
-                       ip = *(code + ip + 1);
+                       ip = *(int*)(code + ip + 1);
                        ip--;
                    }
                    else
-                       ip++;
+                       ip+=4;
 
                    break;
 
-            case JE:                   
+            case JE:                                      
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
                    if (abs (tempPop1 - tempPop2) < 1e-10)
                    {                       
-                       ip = *(code + ip + 1);
+                       ip = *(int*)(code + ip + 1);
                        ip--;
                    }
                    else
-                       ip++;
+                       ip+=4;
 
                    break;
 
-            case JNE:                   
+            case JNE:                                      
                    popStk<double>(&proc.stackProc, &tempPop1);
                    popStk<double>(&proc.stackProc, &tempPop2);
 
                    if (abs (tempPop1 - tempPop2) >= 1e-10)
                    {                       
-                       ip = *(code + ip + 1);
+                       ip = *(int*)(code + ip + 1);
                        ip--;
                    }
                    else
-                       ip++;
+                       ip+=4;
 
                    break;
 

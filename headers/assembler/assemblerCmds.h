@@ -143,6 +143,7 @@ bool isLabel (char* line);
 bool callocTheInside (struct label** labels);
 void removeSpaces (char** line);
 int countSpacesInFront (char* line);
+void restoreBrackets (char **line);
 
 void freeAllLabels (struct label** labels, size_t sizeOfLabels);
 #endif
