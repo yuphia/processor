@@ -1,4 +1,4 @@
-### processor - a program emulating the work of a real life processor
+### Processor - a program emulating the work of a real life processor
 
 # Table of contents:
 
