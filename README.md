@@ -13,6 +13,11 @@
 3) run ``cmake "path to processor root dir"``
 4) run ``make``
 
+# Running:
+    
+Assembler is run like this: ``./assemblerExec asmFile binaryFile``
+Processor is run like this: ``./processorExec binaryFile``
+
 # Short description of the language
 
 register names - {ax, bx, cx, dx}
