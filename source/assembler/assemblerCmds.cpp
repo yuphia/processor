@@ -375,7 +375,7 @@ enum compilationErrs compileCode (struct Text *codeText, char* codeFileName)
 
     pInfo = compileCodeMain (&info, codeText, codeFileName);
 
-    if (pInfo->compilationStatus != NO_ERROR)
+    if (pInfo->compilationStatus != NO_ERROR) 
         printErrorInfo (pInfo);
 
     switch (pInfo->compilationStatus)

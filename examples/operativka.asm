@@ -3,4 +3,7 @@ pop ax
 push 10
 pop [ax+5]
 push [10]
+print
+
+
 hlt

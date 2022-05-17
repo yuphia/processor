@@ -25,18 +25,20 @@ enum errCodes
 
 struct registers
     {
-    double ax;
+    double* registers;
+    size_t amount;
+    /*double ax;
     double bx;
     double cx;
-    double dx;
+    double dx;*/
     };
 
 enum registersEnum
     {
-    ax = 1,
-    bx = 2,
-    cx = 3,
-    dx = 4
+    ax = 0,
+    bx = 1,
+    cx = 2,
+    dx = 3
     };
 
 struct processor
@@ -60,6 +62,10 @@ void fillOperativeNAN (double* operative);
 enum errCodes pushStkFromRegister (enum registersEnum reg, struct processor *proc);
 
 enum errCodes popStkToRegister (enum registersEnum reg, struct processor *proc);
+
+void regsNAN (struct registers * regs);
+
+
 
 //double abs (double n);
 #endif

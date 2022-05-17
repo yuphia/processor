@@ -33,7 +33,10 @@ enum errCodes runCode (unsigned char* code, size_t sizeOfCode)
     struct stk<int> stkForCalls = {};
     ctorStk<int> (&stkForCalls, INT_MAX, &dumpFunctionInt);
 
-    struct processor proc = {{NAN, NAN, NAN, NAN}, stkForProc, stkForCalls, {}};
+    struct registers regs = {(double*)calloc (4, sizeof (double)), 4};
+    regsNAN (&regs);
+
+    struct processor proc = {regs, stkForProc, stkForCalls, {}};
     fillOperativeNAN (proc.operative);
         
     for (size_t ip = 0; ip < sizeOfCode; ip++)
@@ -396,16 +399,21 @@ void fillOperativeNAN (double* operative)
 
 enum errCodes pushStkFromRegister (enum registersEnum reg, struct processor *proc)
 {
-    switch (reg)
+    if (reg < proc->regs.amount)   
+    {
+        pushStk<double> (&(proc->stackProc), proc->regs.registers[reg]);
+    }
+    else    
+        return UNKNOWN_REGISTER;
+    /*switch (reg)
     {
         case ax:
             //printf ("from ax pushed %lg\n", proc->regs.ax);
-            pushStk<double> (&(proc->stackProc), proc->regs.ax);
-            break;
+
 
         case bx:
             //printf ("from bx pushed %lg\n", proc->regs.bx);
-            pushStk<double> (&(proc->stackProc), proc->regs.bx);
+            pushStk<double> (&(proc->stackProc), proc->regs[bx]);
             break;
 
         case cx:
@@ -420,7 +428,7 @@ enum errCodes pushStkFromRegister (enum registersEnum reg, struct processor *pro
 
         default:
             return UNKNOWN_REGISTER;
-    }
+    }*/
 
     return NO_ERROR;
 }
@@ -428,7 +436,17 @@ enum errCodes pushStkFromRegister (enum registersEnum reg, struct processor *pro
 enum errCodes popStkToRegister (enum registersEnum reg, struct processor *proc)
 {
     double tempForPop = NAN;
-    switch (reg)
+
+    if (reg < proc->regs.amount)   
+    {
+        popStk<double> (&(proc->stackProc), &tempForPop);
+        proc->regs.registers[reg] = tempForPop;            
+    }
+    else    
+        return UNKNOWN_REGISTER;
+
+
+/*    switch (reg)
     {
         case ax:
             popStk<double> (&(proc->stackProc), &tempForPop);
@@ -455,7 +473,7 @@ enum errCodes popStkToRegister (enum registersEnum reg, struct processor *proc)
 
         default:
             return UNKNOWN_REGISTER;
-    }
+    }*/
 
     return NO_ERROR;
 }
@@ -464,5 +482,11 @@ enum errCodes popStkToRegister (enum registersEnum reg, struct processor *proc)
 {
     return (n > 0) ? n : -n;
 }*/
+
+void regsNAN (struct registers * regs)
+{
+    for (int i = 0; i < regs->amount; i++)
+        regs->registers[i] = NAN;
+}
 
 #endif

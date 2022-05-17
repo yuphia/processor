@@ -52,11 +52,11 @@ enum compilationErrs
 
 enum Reg
         {
-        AX = 1,
-        BX = 2,
-        CX = 3,
-        DX = 4,
-        WRONG_REG = 5
+        AX = 0,
+        BX = 1,
+        CX = 2,
+        DX = 3,
+        WRONG_REG = 4
         };
 
 struct errorInfo
